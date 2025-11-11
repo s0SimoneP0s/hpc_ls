@@ -13,8 +13,13 @@ make run THREADS=8
 # O direttamente:
 OMP_NUM_THREADS=8 ./jacobi-1d-imper_omp
 
-# Test con vari numeri di thread
-make test
+# Test con vari numeri di thread e vari dataset
+make test2
+make test10
+make test100 # standard
+make test1000
+make test10000
+
 
 # Compilazione ottimizzata
 make optimized
