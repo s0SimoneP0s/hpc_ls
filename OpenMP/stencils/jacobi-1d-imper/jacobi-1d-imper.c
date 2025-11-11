@@ -68,10 +68,8 @@ int main(int argc, char **argv)
   /* Retrieve problem size. */
   int n = N;
   int tsteps = TSTEPS;
+
   
-//  #pragma omp parallel  
-//  printf("n = %d\ntsteps = %d\nthreads = %d\n", n, tsteps, __builtin_omp_get_thread_num() );
-//  printf("n = %d\ntsteps = %d\nthreads = %d\n", n, tsteps, _SC_THREADS );
 #pragma omp parallel 
 {
 	#pragma omp single
