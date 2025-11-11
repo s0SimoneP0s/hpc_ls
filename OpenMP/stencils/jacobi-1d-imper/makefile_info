@@ -1,0 +1,23 @@
+# Compilazione standard
+make
+
+# Compilazione con dataset specifico
+make DATASET=-DLARGE_DATASET
+
+# Esecuzione con 4 thread (default)
+make run
+
+# Esecuzione con 8 thread
+make run THREADS=8
+
+# O direttamente:
+OMP_NUM_THREADS=8 ./jacobi-1d-imper_omp
+
+# Test con vari numeri di thread
+make test
+
+# Compilazione ottimizzata
+make optimized
+
+# Pulizia
+make clean
