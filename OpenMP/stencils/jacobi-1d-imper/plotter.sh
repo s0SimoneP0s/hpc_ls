@@ -1,87 +1,74 @@
 #!/bin/bash
-# Script per estrarre dati da output perf in formato CSV
-# make test > input.txt 2>&1
-# Uso: ./parse_perf.sh input.txt > output.csv
+# Script cumulativo per estrarre dati da output perf e convertirli in CSV
+# Uso: ./parse_perf.sh > output.csv
 
 # Funzione per formattare numeri
 format_number() {
     local num="$1"
-    # Rimuovi punti usati come separatori di migliaia
-    num="${num//./}"
-    # Converti virgola decimale in punto
-    num="${num//,/.}"
+    num="${num//./}"       # rimuove separatori di migliaia
+    num="${num//,/.}"      # converte la virgola decimale in punto
     echo "$num"
 }
 
+# Lista dei test dataset da eseguire
+declare -a test_size_list=("test2" "test10" "test100" "test1000" "test10000")
 
-declare -a test_size_list
+# Stampa intestazione CSV una sola volta
+echo "dataset,n,tsteps,threads,seconds_time_elapsed,insn_per_cycle,branch_misses"
 
-test_size_list=(test2 test10 test100 test1000 test1000)
-for i in ${test_size_list[@]} ; do 
-    echo ${i}
-    make ${i} > input_${i}.txt 2>&1
+# Loop su tutti i dataset
+for i in "${test_size_list[@]}"; do
+    echo "=== Esecuzione ${i} ===" >&2
 
-    # Stampa intestazione CSV
-    echo "n,tsteps,threads,seconds_time_elapsed,insn_per_cycle,branch_misses"
+    # Esegui make e salva l'output
+    make "$i" > "input_${i}.txt" 2>&1
 
-    # Variabili per memorizzare i valori
-    n=""
-    tsteps=""
+    # Valori noti dal Makefile (puoi adattarli se vuoi)
+    case "$i" in
+        test2)    n=500; tsteps=2 ;;
+        test10)   n=1000; tsteps=10 ;;
+        test100)  n=10000; tsteps=100 ;;
+        test1000) n=100000; tsteps=1000 ;;
+        test10000) n=1000000; tsteps=1000 ;;
+        *) n=0; tsteps=0 ;;
+    esac
+
+    # Variabili temporanee
     threads=""
     time_elapsed=""
     insn_per_cycle=""
     branch_misses=""
 
-    # Leggi il file riga per riga
+    # Parsing file
     while IFS= read -r line; do
-        # Estrai n (cerca esattamente "n = " seguito da numero)
-        if [[ "$line" =~ ^n\ =\ ([0-9]+)$ ]]; then
-            n="${BASH_REMATCH[1]}"
-            echo $n
+        # threads
+        if [[ "$line" =~ ^===\ Test\ con\ ([0-9]+)\ thread ]]; then
+            threads="${BASH_REMATCH[1]}"
         fi
-    
-        # Estrai tsteps (cerca esattamente "tsteps = " seguito da numero)
-        if [[ "$line" =~ ^tsteps\ =\ ([0-9]+)$ ]]; then
-            tsteps="${BASH_REMATCH[1]}"
-            echo $tsteps
-        fi
-        
-        # Estrai threads (cerca esattamente "threads = " seguito da numero)
-        if [[ "$line" =~ ^threads\ =\ ([0-9]+)$ ]]; then
-            tsteps="${BASH_REMATCH[1]}"
-            echo $tsteps
-        fi
-        
 
-        # Estrai insn per cycle (cattura il valore DOPO #, gestendo , o . come decimali)
+        # insn per cycle
         if [[ "$line" =~ instructions.*#[[:space:]]+([0-9]+)[,.]([0-9]+)[[:space:]]+insn\ per\ cycle ]]; then
-            # Caso con virgola o punto come separatore decimale (es: 0,84 o 0.84)
             insn_per_cycle="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}"
-            echo $insn_per_cycle
         elif [[ "$line" =~ instructions.*#[[:space:]]+([0-9]+)[[:space:]]+insn\ per\ cycle ]]; then
-            # Caso senza decimali
             insn_per_cycle="${BASH_REMATCH[1]}"
-            echo $insn_per_cycle
         fi
-        
-        # Estrai branch-misses (gestisce sia . che , come separatori di migliaia)
+
+        # branch misses
         if [[ "$line" =~ ^[[:space:]]+([0-9]+)[.,]?([0-9]*)[[:space:]]+branch-misses ]]; then
             branch_misses="${BASH_REMATCH[1]}${BASH_REMATCH[2]}"
-            echo $branch_misses
         fi
-        
-        # Estrai seconds time elapsed (deve iniziare con spazi)
+
+        # seconds time elapsed
         if [[ "$line" =~ ^[[:space:]]+([0-9]+[,.]?[0-9]+)[[:space:]]+seconds\ time\ elapsed ]]; then
             time_elapsed=$(format_number "${BASH_REMATCH[1]}")
-            echo $time_elapsed
 
-            # Quando troviamo time_elapsed, stampiamo la riga completa
-            if [[ -n "$n" && -n "$tsteps" && -n "$threads" ]]; then
-                echo "$n,$tsteps,$threads,$time_elapsed,$insn_per_cycle,$branch_misses"
-                ((count++))
-                insn_per_cycle=""
-                branch_misses=""
-            fi
+            # Stampa riga CSV
+            echo "${i},${n},${tsteps},${threads:-0},${time_elapsed:-0},${insn_per_cycle:-0},${branch_misses:-0}"
+
+            # Reset
+            time_elapsed=""
+            insn_per_cycle=""
+            branch_misses=""
         fi
-    done < input_${i}.txt
+    done < "input_${i}.txt"
 done
