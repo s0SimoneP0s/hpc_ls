@@ -55,8 +55,10 @@ static void kernel_jacobi_1d_imper(int tsteps,
     #pragma omp for schedule(static) 
     for (i = 1; i < _PB_N - 1; i++)
       B[i] = 0.33333 * (A[i - 1] + A[i] + A[i + 1]);
+      
+
     #pragma omp for schedule(static) 
-    for (j = 1; j < _PB_N - 1; j++) 
+    for (j = 4; j < _PB_N - 1; j+=4) 
       A[j] = B[j];
   }
 }
@@ -66,7 +68,15 @@ int main(int argc, char **argv)
   /* Retrieve problem size. */
   int n = N;
   int tsteps = TSTEPS;
-  printf("n = %d\ntsteps = %d\nthreads = %d\n", n, tsteps, omp_get_num_threads());
+  
+//  #pragma omp parallel  
+//  printf("n = %d\ntsteps = %d\nthreads = %d\n", n, tsteps, __builtin_omp_get_thread_num() );
+//  printf("n = %d\ntsteps = %d\nthreads = %d\n", n, tsteps, _SC_THREADS );
+#pragma omp parallel 
+{
+	#pragma omp single
+	printf("n = %d\ntsteps = %d\nthreads = %d\n", n, tsteps, omp_get_num_threads() );
+}
 
   /* Variable declaration/allocation. */
   POLYBENCH_1D_ARRAY_DECL(A, DATA_TYPE, N, n);
