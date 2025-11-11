@@ -37,16 +37,19 @@ for i in ${test_size_list[@]} ; do
         # Estrai n (cerca esattamente "n = " seguito da numero)
         if [[ "$line" =~ ^n\ =\ ([0-9]+)$ ]]; then
             n="${BASH_REMATCH[1]}"
+            echo $n
         fi
-        
+    
         # Estrai tsteps (cerca esattamente "tsteps = " seguito da numero)
         if [[ "$line" =~ ^tsteps\ =\ ([0-9]+)$ ]]; then
             tsteps="${BASH_REMATCH[1]}"
+            echo $tsteps
         fi
         
         # Estrai threads (cerca esattamente "threads = " seguito da numero)
         if [[ "$line" =~ ^threads\ =\ ([0-9]+)$ ]]; then
-            threads="${BASH_REMATCH[1]}"
+            tsteps="${BASH_REMATCH[1]}"
+            echo $tsteps
         fi
         
 
@@ -54,20 +57,24 @@ for i in ${test_size_list[@]} ; do
         if [[ "$line" =~ instructions.*#[[:space:]]+([0-9]+)[,.]([0-9]+)[[:space:]]+insn\ per\ cycle ]]; then
             # Caso con virgola o punto come separatore decimale (es: 0,84 o 0.84)
             insn_per_cycle="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}"
+            echo $insn_per_cycle
         elif [[ "$line" =~ instructions.*#[[:space:]]+([0-9]+)[[:space:]]+insn\ per\ cycle ]]; then
             # Caso senza decimali
             insn_per_cycle="${BASH_REMATCH[1]}"
+            echo $insn_per_cycle
         fi
         
         # Estrai branch-misses (gestisce sia . che , come separatori di migliaia)
         if [[ "$line" =~ ^[[:space:]]+([0-9]+)[.,]?([0-9]*)[[:space:]]+branch-misses ]]; then
             branch_misses="${BASH_REMATCH[1]}${BASH_REMATCH[2]}"
+            echo $branch_misses
         fi
         
         # Estrai seconds time elapsed (deve iniziare con spazi)
         if [[ "$line" =~ ^[[:space:]]+([0-9]+[,.]?[0-9]+)[[:space:]]+seconds\ time\ elapsed ]]; then
             time_elapsed=$(format_number "${BASH_REMATCH[1]}")
-            
+            echo $time_elapsed
+
             # Quando troviamo time_elapsed, stampiamo la riga completa
             if [[ -n "$n" && -n "$tsteps" && -n "$threads" ]]; then
                 echo "$n,$tsteps,$threads,$time_elapsed,$insn_per_cycle,$branch_misses"
