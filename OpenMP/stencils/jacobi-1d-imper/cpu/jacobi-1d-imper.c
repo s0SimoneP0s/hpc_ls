@@ -8,7 +8,7 @@
 
 /* Include benchmark-specific header. */
 /* Default data type is double, default size is 100x10000. */
-#include "jacobi-1d-imper.h"
+#include "../jacobi-1d-imper.h"
 
 /* Array initialization. */
 static void init_array(int n,
