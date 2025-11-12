@@ -1,7 +1,7 @@
 #!/bin/bash
 # Script cumulativo per estrarre dati da output perf e convertirli in CSV
 # Uso: ./parse_perf.sh > output.csv
-
+set -e
 # Funzione per formattare numeri
 format_number() {
     local num="$1"
@@ -75,4 +75,4 @@ for i in "${test_size_list[@]}"; do
 done
 
 
-rm intpu_*.txt
+rm input_test_*.txt

@@ -58,7 +58,7 @@ static void kernel_jacobi_1d_imper(int tsteps,
       
 
     #pragma omp for schedule(static) 
-    for (j = 4; j < _PB_N - 1; j+=4) 
+    for (j = 1; j < _PB_N - 1; j++) 
       A[j] = B[j];
   }
 }
