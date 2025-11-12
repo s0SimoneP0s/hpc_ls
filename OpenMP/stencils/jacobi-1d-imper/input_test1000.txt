@@ -1,0 +1,110 @@
+===================================================
+Esecuzione LARGE_DATASET 
+=== Test con 1 thread ===
+OMP_NUM_THREADS=1 perf stat -r 10 ./jacobi-1d-imper_omp
+0.000005
+0.000006
+0.000006
+0.000005
+0.000006
+0.000006
+0.000006
+0.000006
+0.000005
+0.000005
+
+ Performance counter stats for './jacobi-1d-imper_omp' (10 runs):
+
+         17,976672      task-clock (msec)         #    0,888 CPUs utilized            ( +-  0,22% )
+                 2      context-switches          #    0,128 K/sec                    ( +-  9,28% )
+                 0      cpu-migrations            #    0,017 K/sec                    ( +- 50,92% )
+               595      page-faults               #    0,033 M/sec                    ( +-  0,07% )
+        26.570.968      cycles                    #    1,478 GHz                      ( +-  0,22% )
+        22.702.609      instructions              #    0,85  insn per cycle           ( +-  0,04% )
+   <not supported>      branches                                                    
+            17.696      branch-misses                                                 ( +-  1,08% )
+
+       0,020242680 seconds time elapsed                                          ( +-  0,48% )
+
+
+=== Test con 2 thread ===
+OMP_NUM_THREADS=2 perf stat -r 10 ./jacobi-1d-imper_omp
+0.000005
+0.000006
+0.000005
+0.000005
+0.000005
+0.000005
+0.000006
+0.000005
+0.000006
+0.000005
+
+ Performance counter stats for './jacobi-1d-imper_omp' (10 runs):
+
+         18,508079      task-clock (msec)         #    1,490 CPUs utilized            ( +-  0,34% )
+                 2      context-switches          #    0,135 K/sec                    ( +- 12,29% )
+                 0      cpu-migrations            #    0,027 K/sec                    ( +- 33,33% )
+               597      page-faults               #    0,032 M/sec                    ( +-  0,04% )
+        27.328.473      cycles                    #    1,477 GHz                      ( +-  0,35% )
+        24.974.959      instructions              #    0,91  insn per cycle           ( +-  0,71% )
+   <not supported>      branches                                                    
+            19.711      branch-misses                                                 ( +-  0,72% )
+
+       0,012423115 seconds time elapsed                                          ( +-  0,65% )
+
+
+=== Test con 4 thread ===
+OMP_NUM_THREADS=4 perf stat -r 10 ./jacobi-1d-imper_omp
+0.000005
+0.000005
+0.000005
+0.000005
+0.000006
+0.000005
+0.000005
+0.000005
+0.000005
+0.000005
+
+ Performance counter stats for './jacobi-1d-imper_omp' (10 runs):
+
+         20,037427      task-clock (msec)         #    2,201 CPUs utilized            ( +-  0,46% )
+                 5      context-switches          #    0,265 K/sec                    ( +- 11,27% )
+                 1      cpu-migrations            #    0,030 K/sec                    ( +- 27,22% )
+               601      page-faults               #    0,030 M/sec                    ( +-  0,06% )
+        29.533.566      cycles                    #    1,474 GHz                      ( +-  0,46% )
+        30.963.322      instructions              #    1,05  insn per cycle           ( +-  1,06% )
+   <not supported>      branches                                                    
+            22.317      branch-misses                                                 ( +-  0,86% )
+
+       0,009103818 seconds time elapsed                                          ( +-  5,51% )
+
+
+=== Test con 8 thread ===
+OMP_NUM_THREADS=8 perf stat -r 10 ./jacobi-1d-imper_omp
+0.000005
+0.000005
+0.000006
+0.000005
+0.000006
+0.000006
+0.000005
+0.000006
+0.000005
+0.000005
+
+ Performance counter stats for './jacobi-1d-imper_omp' (10 runs):
+
+         18,946986      task-clock (msec)         #    1,984 CPUs utilized            ( +-  0,60% )
+                27      context-switches          #    0,001 M/sec                    ( +-  2,02% )
+                 8      cpu-migrations            #    0,443 K/sec                    ( +- 10,07% )
+               609      page-faults               #    0,032 M/sec                    ( +-  0,06% )
+        27.744.131      cycles                    #    1,464 GHz                      ( +-  0,60% )
+        23.394.810      instructions              #    0,84  insn per cycle           ( +-  0,20% )
+   <not supported>      branches                                                    
+            28.104      branch-misses                                                 ( +-  1,22% )
+
+       0,009548728 seconds time elapsed                                          ( +-  3,51% )
+
+....................................................

@@ -18,7 +18,7 @@ echo "dataset,n,tsteps,threads,seconds_time_elapsed,insn_per_cycle,branch_misses
 
 # Loop su tutti i dataset
 for i in "${test_size_list[@]}"; do
-    echo "=== Esecuzione ${i} ===" >&2
+    #echo "=== Esecuzione ${i} ===" >&2
 
     # Esegui make e salva l'output
     make "$i" > "input_${i}.txt" 2>&1
