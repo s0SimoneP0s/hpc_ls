@@ -322,9 +322,6 @@ test10000g: $(EXE)
 
 
 
-
-
-
 optimized: CFLAGS += -O3 -march=native -mtune=native -ffast-math
 optimized: $(EXE)
 
