@@ -72,3 +72,4 @@ for i in "${test_size_list[@]}"; do
         fi
     done < "input_${i}.txt"
 done
+rm input_*.txt
