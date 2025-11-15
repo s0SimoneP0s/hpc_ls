@@ -54,7 +54,7 @@ static void kernel_jacobi_1d_imper(int tsteps,
 
   char* num_teams_env = getenv("OMP_NUM_TEAMS");
   char* thread_limit_env = getenv("OMP_TEAMS_THREAD_LIMIT");
-  printf("Teams: %s\nThread limit: %d\n",num_teams_env,thread_limit_env);
+  printf("Teams: %s\nThread limit: %s\n",num_teams_env,thread_limit_env);
 
   int THREADS_CPU = atoi(num_teams_env);
   int THREADS_GPU = atoi(thread_limit_env);
