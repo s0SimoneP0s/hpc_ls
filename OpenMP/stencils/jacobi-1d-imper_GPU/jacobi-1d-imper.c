@@ -70,9 +70,6 @@ static void kernel_jacobi_1d_imper(int tsteps,
   }
 }
 
-int omp_get_team_num(void);
-int omp_get_thread_limit(void);
-int omp_get_num_teams(void);
 
 int main(int argc, char **argv)
 {
@@ -90,9 +87,7 @@ int main(int argc, char **argv)
 
 
     
-    printf("OMP_NUM_TEAMS=%s\n", num_teams_env ? num_teams_env : "non settata");
-    printf("OMP_TEAMS_THREAD_LIMIT=%s\n", thread_limit_env ? thread_limit_env : "non settata");
-    
+
 
   /* Initialize array(s). */
   init_array(n, POLYBENCH_ARRAY(A), POLYBENCH_ARRAY(B));
