@@ -73,13 +73,21 @@ int main(int argc, char **argv)
   int n = N;
   int tsteps = TSTEPS;
   printf("n = %d\ntsteps = %d\n",n,tsteps);
-  #pragma omp target teams
-  {	
-  	int devices = omp_get_num_devices();
-  	int teams = omp_get_num_teams();
-  	int thread_limit = omp_get_thread_limit();
-	  printf("Devices: %d\nTeams: %d\nThread limit: %d\n",devices,teams,thread_limit);
-  }
+    #pragma omp target teams
+    {
+        #pragma omp parallel
+        {
+            #pragma omp single
+            {
+                int num_teams = omp_get_num_teams();
+                int team_num = omp_get_team_num();
+                int thread_limit = omp_get_thread_limit();
+                int num_threads = omp_get_num_threads();
+                printf("Teams: %d\nThread limit: %d\nNum Treads: %d\n",
+                          num_teams,thread_limit,num_threads);
+            }
+        }
+    }
 
   /* Variable declaration/allocation. */
   POLYBENCH_1D_ARRAY_DECL(A, DATA_TYPE, N, n);
