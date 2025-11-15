@@ -54,13 +54,17 @@ static void kernel_jacobi_1d_imper(int tsteps,
                                    DATA_TYPE POLYBENCH_1D(A, N, n),
                                    DATA_TYPE POLYBENCH_1D(B, N, n)
                                    )
+int nte = atoi(num_teams_env);
+int tml = atoi(thread_limit_env);
+printf("\n%d   %d",nte,tlm)
 
+thread_limit_env
 {
   int t, i, j;
   #pragma omp target data map(tofrom: A[0:n], B[0:n])
   for (t = 0; t < _PB_TSTEPS; t++)
   {
-    #pragma omp target teams distribute parallel for simd num_teams(num_teams_env) thread_limit(thread_limit_env)
+    #pragma omp target teams distribute parallel for simd num_teams(10) thread_limit(10)
     for (i = 1; i < _PB_N - 1; i++)
       B[i] = 0.33333 * (A[i - 1] + A[i] + A[i + 1]);
     #pragma omp target teams distribute parallel for simd
