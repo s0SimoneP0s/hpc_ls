@@ -83,7 +83,6 @@ test_large: $(EXE)
 	@echo "Esecuzione LARGE_DATASET "
 	@echo "=== Test con 1 thread ==="
 	OMP_NUM_THREADS=1 perf stat -r 10 ./$(EXE)
-
 	@echo ....................................................
 
 test_extralarge: $(EXE)
@@ -91,8 +90,7 @@ test_extralarge: $(EXE)
 	@echo "Esecuzione EXTRALARGE_DATASET "
 	@echo "=== Test con 1 thread ==="
 	OMP_NUM_THREADS=1 perf stat -r 10 ./$(EXE)
-...........
-
+	@echo ....................................................
 
 
 optimized: CFLAGS += -O3 -march=native -mtune=native -ffast-math
