@@ -64,13 +64,15 @@ static void kernel_jacobi_1d_imper(int tsteps,
   char* thread_limit_env = getenv("OMP_TEAMS_THREAD_LIMIT");
   printf("Teams: %s\nThread limit: %d\n",num_teams_env,thread_limit_env);
 
-  
+  int THREADS_CPU = atoi(num_teams_env);
+  int THREADS_GPU = atoi(thread_limit_env);
+
 {
   int t, i, j;
   #pragma omp target data map(tofrom: A[0:n], B[0:n])
   for (t = 0; t < _PB_TSTEPS; t++)
   {
-    #pragma omp target teams distribute parallel for simd 
+    #pragma omp target teams distribute parallel for simd num_teams(THREADS_CPU) thread_limit(THREADS_GPU)
     for (i = 1; i < _PB_N - 1; i++)
       B[i] = 0.33333 * (A[i - 1] + A[i] + A[i + 1]);
     #pragma omp target teams distribute parallel for simd
