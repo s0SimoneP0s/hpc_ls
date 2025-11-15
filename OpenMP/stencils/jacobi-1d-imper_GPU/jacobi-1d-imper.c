@@ -72,6 +72,14 @@ int main(int argc, char **argv)
   /* Retrieve problem size. */
   int n = N;
   int tsteps = TSTEPS;
+  printf("n = %d\ntsteps = %d\n",n,tsteps);
+  #pragma omp target teams
+  {	
+  	int devices = omp_get_num_devices();
+  	int teams = omp_get_num_teams();
+  	int thread_limit = omp_get_thread_limit();
+	printf("Devices: %d\nTeams: %d\nThread limit: %d\n",devices,teams,thread_limit);
+  }
 
   /* Variable declaration/allocation. */
   POLYBENCH_1D_ARRAY_DECL(A, DATA_TYPE, N, n);

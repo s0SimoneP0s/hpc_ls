@@ -65,7 +65,8 @@ int main(int argc, char **argv)
   /* Retrieve problem size. */
   int n = N;
   int tsteps = TSTEPS;
-
+  printf("n = %d\ntsteps = %d\n",n,tsteps);
+  
   /* Variable declaration/allocation. */
   POLYBENCH_1D_ARRAY_DECL(A, DATA_TYPE, N, n);
   POLYBENCH_1D_ARRAY_DECL(B, DATA_TYPE, N, n);
