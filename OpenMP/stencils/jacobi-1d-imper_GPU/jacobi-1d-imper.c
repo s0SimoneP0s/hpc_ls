@@ -59,17 +59,26 @@ static void kernel_jacobi_1d_imper(int tsteps,
   int THREADS_CPU = atoi(num_teams_env);
   int THREADS_GPU = atoi(thread_limit_env);
 
-  int t, i, j;
-  #pragma omp target data map(tofrom: A[0:n], B[0:n])
-  for (t = 0; t < _PB_TSTEPS; t++)
+  #pragma omp target data map(tofrom: A[0:n]) map(alloc: B[0:n])
   {
-    #pragma omp target teams distribute parallel for simd num_teams(THREADS_CPU) thread_limit(THREADS_GPU)
-    for (i = 1; i < _PB_N - 1; i++)
-      B[i] = 0.33333 * (A[i - 1] + A[i] + A[i + 1]);
-    #pragma omp target teams distribute parallel for simd
-    for (j = 1; j < _PB_N - 1; j++) 
-      A[j] = B[j];
-  }
+    for (t = 0; t < _PB_TSTEPS; t++)
+    {
+      #pragma omp target teams distribute parallel for simd \
+                  num_teams(THREADS_CPU) thread_limit(THREADS_GPU) \
+                  schedule(static) 
+      for (i = 1; i < _PB_N - 1; i++)
+      {
+        B[i] = 0.33333 * (A[i - 1] + A[i] + A[i + 1]);
+      }
+      #pragma omp target teams distribute parallel for simd \
+                  num_teams(THREADS_CPU) thread_limit(THREADS_GPU) \
+                  schedule(static) 
+      for (j = 1; i < _PB_N - 1; j++)
+      {
+        A[i] = B[i];
+      }
+    }
+  } 
 }
 
 
