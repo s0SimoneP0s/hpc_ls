@@ -12,15 +12,6 @@
 
 
 
-#ifndef OMP_NUM_TEAMS
-  #define OMP_NUM_TEAMS 2
-#endif
-
-#ifndef OMP_TEAM_LIMIT
-  #define OMP_TEAM_LIMIT 8
-#endif
-
-
 /* Array initialization. */
 static void init_array(int n,
                        DATA_TYPE POLYBENCH_1D(A, N, n),
@@ -59,6 +50,7 @@ static void kernel_jacobi_1d_imper(int tsteps,
                                    DATA_TYPE POLYBENCH_1D(A, N, n),
                                    DATA_TYPE POLYBENCH_1D(B, N, n)
                                    )
+{
 
   char* num_teams_env = getenv("OMP_NUM_TEAMS");
   char* thread_limit_env = getenv("OMP_TEAMS_THREAD_LIMIT");
@@ -67,7 +59,6 @@ static void kernel_jacobi_1d_imper(int tsteps,
   int THREADS_CPU = atoi(num_teams_env);
   int THREADS_GPU = atoi(thread_limit_env);
 
-{
   int t, i, j;
   #pragma omp target data map(tofrom: A[0:n], B[0:n])
   for (t = 0; t < _PB_TSTEPS; t++)
@@ -81,9 +72,6 @@ static void kernel_jacobi_1d_imper(int tsteps,
   }
 }
 
-int omp_get_team_num(void);
-int omp_get_thread_limit(void);
-int omp_get_num_teams(void);
 
 int main(int argc, char **argv)
 {
