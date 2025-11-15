@@ -58,7 +58,7 @@ static void kernel_jacobi_1d_imper(int tsteps,
   #pragma omp target data map(tofrom: A[0:n], B[0:n])
   for (t = 0; t < _PB_TSTEPS; t++)
   {
-    #pragma omp target teams distribute parallel for simd num_teams(THREADS_CPU) thread_limit(THREADS_GPU)
+    #pragma omp target teams distribute parallel for simd num_teams thread_limit
     for (i = 1; i < _PB_N - 1; i++)
       B[i] = 0.33333 * (A[i - 1] + A[i] + A[i + 1]);
     #pragma omp target teams distribute parallel for simd
