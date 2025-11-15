@@ -58,7 +58,7 @@ static void kernel_jacobi_1d_imper(int tsteps,
 
   int THREADS_CPU = atoi(num_teams_env);
   int THREADS_GPU = atoi(thread_limit_env);
-
+  int t, i, j;
   #pragma omp target data map(tofrom: A[0:n]) map(alloc: B[0:n])
   {
     for (t = 0; t < _PB_TSTEPS; t++)
