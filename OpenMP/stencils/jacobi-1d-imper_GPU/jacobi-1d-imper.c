@@ -69,6 +69,16 @@ static void kernel_jacobi_1d_imper(int tsteps,
     #pragma omp target teams distribute parallel for simd
     for (j = 1; j < _PB_N - 1; j++) 
       A[j] = B[j];
+
+    #pragma omp target
+    {
+        if (omp_is_initial_device()) {
+            printf("⚠️ ATTENZIONE: Codice su CPU!\n");
+        } else {
+            printf("✅ Codice su GPU\n");
+        }
+    }
+
   }
 
   
@@ -116,14 +126,7 @@ int main(int argc, char **argv)
     printf("Numero dispositivi: %d\n", omp_get_num_devices());
     printf("Dispositivo default: %d\n", omp_get_default_device());
     
-    #pragma omp target
-    {
-        if (omp_is_initial_device()) {
-            printf("⚠️ ATTENZIONE: Codice su CPU!\n");
-        } else {
-            printf("✅ Codice su GPU\n");
-        }
-    }
+
 
   return 0;
 }
