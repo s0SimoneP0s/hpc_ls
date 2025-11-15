@@ -53,6 +53,7 @@ static void kernel_jacobi_1d_imper(int tsteps,
                                    DATA_TYPE POLYBENCH_1D(A, N, n),
                                    DATA_TYPE POLYBENCH_1D(B, N, n)
                                    )
+
 {
   int t, i, j;
   #pragma omp target data map(tofrom: A[0:n], B[0:n])
@@ -93,14 +94,18 @@ int main(int argc, char **argv)
       }
   }
 
-#pragma omp target teams distribute num_teams(2) thread_limit(6)
-for(int i = 0; i < 2; i++) 
+#pragma omp target data map(tofrom: A[0:n], B[0:n])
 {
-    int team_num = omp_get_team_num();
-    int thread_limit = omp_get_thread_limit();
-    
-    printf("Iterazione %d eseguita dal Team %d, Thread limit: %d\n", 
-           i, team_num, thread_limit);
+
+  #pragma omp target teams distribute num_teams(2) thread_limit(6)
+  for(int i = 0; i < 2; i++) 
+  {
+      int team_num = omp_get_team_num();
+      int thread_limit = omp_get_thread_limit();
+      
+      printf("Iterazione %d eseguita dal Team %d, Thread limit: %d\n", 
+            i, team_num, thread_limit);
+  }
 }
 
   /* Variable declaration/allocation. */
