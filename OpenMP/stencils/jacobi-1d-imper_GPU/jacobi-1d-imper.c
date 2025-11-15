@@ -93,7 +93,16 @@ int main(int argc, char **argv)
       }
   }
 
-
+#pragma omp target teams distribute num_teams(2) thread_limit(6)
+for(int i = 0; i < 2; i++) 
+{
+    int num_teams = omp_get_num_teams();
+    int team_num = omp_get_team_num();
+    int thread_limit = omp_get_thread_limit();
+    
+    printf("Iterazione %d - Team %d di %d, Thread limit: %d\n", 
+           i, team_num, num_teams, thread_limit);
+}
 
   /* Variable declaration/allocation. */
   POLYBENCH_1D_ARRAY_DECL(A, DATA_TYPE, N, n);
