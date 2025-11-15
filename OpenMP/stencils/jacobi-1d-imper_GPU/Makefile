@@ -42,7 +42,7 @@ DATASET ?= -DSTANDARD_DATASET
 
 
 CFLAGS += $(DATASET) $(TIMING)
-.PHONY: all clean run test_mini test10 test_standard_G test_large_G test_extralarge_G
+.PHONY: all clean run test_mini_G test_small_G test_standard_G test_large_G test_extralarge_G
 
 
 
@@ -99,7 +99,7 @@ test_small_G: $(EXE)
 	OMP_NUM_TEAMS=128 OMP_TEAM_LIMIT=128 perf stat -r 10 ./$(EXE)
 	@echo ....................................................
 
-test100g: $(EXE)
+test_standard_G: $(EXE)
 	@echo ===================================================
 	@echo "Esecuzione STANDARD_DATASET "
 	OMP_NUM_TEAMS=2 OMP_TEAM_LIMIT=4 perf stat -r 10 ./$(EXE)
@@ -120,7 +120,7 @@ test100g: $(EXE)
 	OMP_NUM_TEAMS=128 OMP_TEAM_LIMIT=128 perf stat -r 10 ./$(EXE)
 	@echo ....................................................
 
-test1000g: $(EXE)
+test_large_G: $(EXE)
 	@echo ===================================================
 	@echo "Esecuzione LARGE_DATASET "
 	OMP_NUM_TEAMS=2 OMP_TEAM_LIMIT=4 perf stat -r 10 ./$(EXE)
