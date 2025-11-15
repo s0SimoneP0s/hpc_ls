@@ -92,6 +92,23 @@ int main(int argc, char **argv)
         }
     }
 
+  #pragma omp target teams num_teams(2) thread_limit(6)
+  {
+
+      int nteams  = omp_get_num_teams();
+
+      #pragma omp parallel
+      {
+          #pragma omp single
+          {
+              printf("Teams: %d\nThread limit: %d\n",
+                     nteams, omp_get_thread_limit());
+          }
+      }
+  }
+
+
+
   /* Variable declaration/allocation. */
   POLYBENCH_1D_ARRAY_DECL(A, DATA_TYPE, N, n);
   POLYBENCH_1D_ARRAY_DECL(B, DATA_TYPE, N, n);
