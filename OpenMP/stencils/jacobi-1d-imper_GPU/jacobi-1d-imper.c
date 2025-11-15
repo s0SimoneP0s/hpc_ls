@@ -12,8 +12,13 @@
 
 
 
-char* num_teams_env = getenv("OMP_NUM_TEAMS");
-char* thread_limit_env = getenv("OMP_TEAMS_THREAD_LIMIT");
+#ifndef OMP_NUM_TEAMS
+  #define OMP_NUM_TEAMS 2
+#endif
+
+#ifndef OMP_TEAM_LIMIT
+  #define OMP_TEAM_LIMIT 8
+#endif
 
 
 /* Array initialization. */
@@ -54,17 +59,13 @@ static void kernel_jacobi_1d_imper(int tsteps,
                                    DATA_TYPE POLYBENCH_1D(A, N, n),
                                    DATA_TYPE POLYBENCH_1D(B, N, n)
                                    )
-int nte = atoi(num_teams_env);
-int tml = atoi(thread_limit_env);
-printf("\n%d   %d",nte,tlm)
 
-thread_limit_env
 {
   int t, i, j;
   #pragma omp target data map(tofrom: A[0:n], B[0:n])
   for (t = 0; t < _PB_TSTEPS; t++)
   {
-    #pragma omp target teams distribute parallel for simd num_teams(10) thread_limit(10)
+    #pragma omp target teams distribute parallel for simd 
     for (i = 1; i < _PB_N - 1; i++)
       B[i] = 0.33333 * (A[i - 1] + A[i] + A[i + 1]);
     #pragma omp target teams distribute parallel for simd
@@ -83,13 +84,16 @@ int main(int argc, char **argv)
   int n = N;
   int tsteps = TSTEPS;
   printf("n = %d\ntsteps = %d\n",n,tsteps);
-  printf("Teams: %s\nThread limit: %s\n",num_teams_env,thread_limit_env);
+
 
 
 
   /* Variable declaration/allocation. */
   POLYBENCH_1D_ARRAY_DECL(A, DATA_TYPE, N, n);
   POLYBENCH_1D_ARRAY_DECL(B, DATA_TYPE, N, n);
+
+    char* num_teams_env = getenv("OMP_NUM_TEAMS");
+    char* thread_limit_env = getenv("OMP_TEAMS_THREAD_LIMIT");
 
 
   /* Initialize array(s). */
