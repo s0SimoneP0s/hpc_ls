@@ -20,35 +20,19 @@ TIMING = -DPOLYBENCH_TIME
 ifeq ($(MAKECMDGOALS),test_mini)
 	DATASET = -DMINI_DATASET
 endif
-ifeq ($(MAKECMDGOALS),test10)
+ifeq ($(MAKECMDGOALS),test_small)
 	DATASET = -DSMALL_DATASET
 endif
-ifeq ($(MAKECMDGOALS),test100)
+ifeq ($(MAKECMDGOALS),test_standard)
 	DATASET = -DSTANDARD_DATASET
 endif
-ifeq ($(MAKECMDGOALS),test1000)
+ifeq ($(MAKECMDGOALS),test_large)
 	DATASET = -DLARGE_DATASET
 endif
-ifeq ($(MAKECMDGOALS),test10000)
+ifeq ($(MAKECMDGOALS),test_extralarge)
 	DATASET = -DEXTRALARGE_DATASET
 endif
 
-
-ifeq ($(MAKECMDGOALS),test_minig)
-	DATASET = -DMINI_DATASET
-endif
-ifeq ($(MAKECMDGOALS),test10g)
-	DATASET = -DSMALL_DATASET
-endif
-ifeq ($(MAKECMDGOALS),test100g)
-	DATASET = -DSTANDARD_DATASET
-endif
-ifeq ($(MAKECMDGOALS),test1000g)
-	DATASET = -DLARGE_DATASET
-endif
-ifeq ($(MAKECMDGOALS),test10000g)
-	DATASET = -DEXTRALARGE_DATASET
-endif
 
 
 # Default se non specificato
@@ -57,7 +41,7 @@ DATASET ?= -DSTANDARD_DATASET
 # Combina tutte le flags
 CFLAGS += $(DATASET) $(TIMING)
 
-.PHONY: all clean run test_mini test10 test100 test1000 test10000
+.PHONY: all clean run test_mini test_small test_standard test_large test_extralarge
 
 all: $(EXE)
 
@@ -86,7 +70,7 @@ test_mini: $(EXE)
 	OMP_NUM_THREADS=8 perf stat -r 10 ./$(EXE)
 	@echo ....................................................
 
-test10: $(EXE)
+test_small: $(EXE)
 	@echo ===================================================
 	@echo "Esecuzione SMALL_DATASET "
 	@echo "=== Test con 1 thread ==="
@@ -99,7 +83,7 @@ test10: $(EXE)
 	OMP_NUM_THREADS=8 perf stat -r 10 ./$(EXE)
 	@echo ....................................................
 
-test100: $(EXE)
+test_standard: $(EXE)
 	@echo ===================================================
 	@echo "Esecuzione STANDARD_DATASET "
 	@echo "=== Test con 1 thread ==="
@@ -112,7 +96,7 @@ test100: $(EXE)
 	OMP_NUM_THREADS=8 perf stat -r 10 ./$(EXE)
 	@echo ....................................................
 
-test1000: $(EXE)
+test_large: $(EXE)
 	@echo ===================================================
 	@echo "Esecuzione LARGE_DATASET "
 	@echo "=== Test con 1 thread ==="
@@ -125,7 +109,7 @@ test1000: $(EXE)
 	OMP_NUM_THREADS=8 perf stat -r 10 ./$(EXE)
 	@echo ....................................................
 
-test10000: $(EXE)
+test_extralarge: $(EXE)
 	@echo ===================================================
 	@echo "Esecuzione EXTRALARGE_DATASET "
 	@echo "=== Test con 1 thread ==="
@@ -136,188 +120,6 @@ test10000: $(EXE)
 	OMP_NUM_THREADS=4 perf stat -r 10 ./$(EXE)
 	@echo "\n=== Test con 8 thread ==="
 	OMP_NUM_THREADS=8 perf stat -r 10 ./$(EXE)
-	@echo ....................................................
-
-#-------------------GPU-----------------------------------------
-
-test_minig: $(EXE)
-	@echo ===================================================
-	@echo "Esecuzione MINI_DATASET "
-	OMP_NUM_TEAMS=2 OMP_TEAM_LIMIT=4 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 2 thread ==="
-	OMP_NUM_TEAMS=2 OMP_TEAM_LIMIT=16 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 4 thread ==="
-	OMP_NUM_TEAMS=2 OMP_TEAM_LIMIT=64 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 8 thread ==="
-	OMP_NUM_TEAMS=2 OMP_TEAM_LIMIT=128 perf stat -r 10 ./$(EXE)
-	@echo "=== Test con limit2 thread ==="
-	OMP_NUM_TEAMS=4 OMP_TEAM_LIMIT=4 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 2 thread ==="
-	OMP_NUM_TEAMS=4 OMP_TEAM_LIMIT=16 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 4 thread ==="
-	OMP_NUM_TEAMS=4 OMP_TEAM_LIMIT=64 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 8 thread ==="
-	OMP_NUM_TEAMS=4 OMP_TEAM_LIMIT=128 perf stat -r 10 ./$(EXE)
-	@echo "=== Test con limit2 thread ==="
-	OMP_NUM_TEAMS=32 OMP_TEAM_LIMIT=4 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 2 thread ==="
-	OMP_NUM_TEAMS=32 OMP_TEAM_LIMIT=16 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 4 thread ==="
-	OMP_NUM_TEAMS=32 OMP_TEAM_LIMIT=64 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 8 thread ==="
-	OMP_NUM_TEAMS=32 OMP_TEAM_LIMIT=128 perf stat -r 10 ./$(EXE)
-	@echo "=== Test con limit2 thread ==="
-	OMP_NUM_TEAMS=128 OMP_TEAM_LIMIT=4 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 2 thread ==="
-	OMP_NUM_TEAMS=128 OMP_TEAM_LIMIT=16 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 4 thread ==="
-	OMP_NUM_TEAMS=128 OMP_TEAM_LIMIT=64 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 8 thread ==="
-	OMP_NUM_TEAMS=128 OMP_TEAM_LIMIT=128 perf stat -r 10 ./$(EXE)
-	@echo ....................................................
-
-test10g: $(EXE)
-	@echo ===================================================
-	@echo "Esecuzione SMALL_DATASET "
-	OMP_NUM_TEAMS=2 OMP_TEAM_LIMIT=4 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 2 thread ==="
-	OMP_NUM_TEAMS=2 OMP_TEAM_LIMIT=16 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 4 thread ==="
-	OMP_NUM_TEAMS=2 OMP_TEAM_LIMIT=64 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 8 thread ==="
-	OMP_NUM_TEAMS=2 OMP_TEAM_LIMIT=128 perf stat -r 10 ./$(EXE)
-	@echo "=== Test con limit2 thread ==="
-	OMP_NUM_TEAMS=4 OMP_TEAM_LIMIT=4 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 2 thread ==="
-	OMP_NUM_TEAMS=4 OMP_TEAM_LIMIT=16 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 4 thread ==="
-	OMP_NUM_TEAMS=4 OMP_TEAM_LIMIT=64 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 8 thread ==="
-	OMP_NUM_TEAMS=4 OMP_TEAM_LIMIT=128 perf stat -r 10 ./$(EXE)
-	@echo "=== Test con limit2 thread ==="
-	OMP_NUM_TEAMS=32 OMP_TEAM_LIMIT=4 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 2 thread ==="
-	OMP_NUM_TEAMS=32 OMP_TEAM_LIMIT=16 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 4 thread ==="
-	OMP_NUM_TEAMS=32 OMP_TEAM_LIMIT=64 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 8 thread ==="
-	OMP_NUM_TEAMS=32 OMP_TEAM_LIMIT=128 perf stat -r 10 ./$(EXE)
-	@echo "=== Test con limit2 thread ==="
-	OMP_NUM_TEAMS=128 OMP_TEAM_LIMIT=4 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 2 thread ==="
-	OMP_NUM_TEAMS=128 OMP_TEAM_LIMIT=16 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 4 thread ==="
-	OMP_NUM_TEAMS=128 OMP_TEAM_LIMIT=64 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 8 thread ==="
-	OMP_NUM_TEAMS=128 OMP_TEAM_LIMIT=128 perf stat -r 10 ./$(EXE)
-	@echo ....................................................
-
-test100g: $(EXE)
-	@echo ===================================================
-	@echo "Esecuzione STANDARD_DATASET "
-	OMP_NUM_TEAMS=2 OMP_TEAM_LIMIT=4 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 2 thread ==="
-	OMP_NUM_TEAMS=2 OMP_TEAM_LIMIT=16 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 4 thread ==="
-	OMP_NUM_TEAMS=2 OMP_TEAM_LIMIT=64 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 8 thread ==="
-	OMP_NUM_TEAMS=2 OMP_TEAM_LIMIT=128 perf stat -r 10 ./$(EXE)
-	@echo "=== Test con limit2 thread ==="
-	OMP_NUM_TEAMS=4 OMP_TEAM_LIMIT=4 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 2 thread ==="
-	OMP_NUM_TEAMS=4 OMP_TEAM_LIMIT=16 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 4 thread ==="
-	OMP_NUM_TEAMS=4 OMP_TEAM_LIMIT=64 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 8 thread ==="
-	OMP_NUM_TEAMS=4 OMP_TEAM_LIMIT=128 perf stat -r 10 ./$(EXE)
-	@echo "=== Test con limit2 thread ==="
-	OMP_NUM_TEAMS=32 OMP_TEAM_LIMIT=4 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 2 thread ==="
-	OMP_NUM_TEAMS=32 OMP_TEAM_LIMIT=16 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 4 thread ==="
-	OMP_NUM_TEAMS=32 OMP_TEAM_LIMIT=64 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 8 thread ==="
-	OMP_NUM_TEAMS=32 OMP_TEAM_LIMIT=128 perf stat -r 10 ./$(EXE)
-	@echo "=== Test con limit2 thread ==="
-	OMP_NUM_TEAMS=128 OMP_TEAM_LIMIT=4 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 2 thread ==="
-	OMP_NUM_TEAMS=128 OMP_TEAM_LIMIT=16 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 4 thread ==="
-	OMP_NUM_TEAMS=128 OMP_TEAM_LIMIT=64 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 8 thread ==="
-	OMP_NUM_TEAMS=128 OMP_TEAM_LIMIT=128 perf stat -r 10 ./$(EXE)
-	@echo ....................................................
-
-test1000g: $(EXE)
-	@echo ===================================================
-	@echo "Esecuzione LARGE_DATASET "
-	OMP_NUM_TEAMS=2 OMP_TEAM_LIMIT=4 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 2 thread ==="
-	OMP_NUM_TEAMS=2 OMP_TEAM_LIMIT=16 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 4 thread ==="
-	OMP_NUM_TEAMS=2 OMP_TEAM_LIMIT=64 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 8 thread ==="
-	OMP_NUM_TEAMS=2 OMP_TEAM_LIMIT=128 perf stat -r 10 ./$(EXE)
-	@echo "=== Test con limit2 thread ==="
-	OMP_NUM_TEAMS=4 OMP_TEAM_LIMIT=4 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 2 thread ==="
-	OMP_NUM_TEAMS=4 OMP_TEAM_LIMIT=16 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 4 thread ==="
-	OMP_NUM_TEAMS=4 OMP_TEAM_LIMIT=64 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 8 thread ==="
-	OMP_NUM_TEAMS=4 OMP_TEAM_LIMIT=128 perf stat -r 10 ./$(EXE)
-	@echo "=== Test con limit2 thread ==="
-	OMP_NUM_TEAMS=32 OMP_TEAM_LIMIT=4 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 2 thread ==="
-	OMP_NUM_TEAMS=32 OMP_TEAM_LIMIT=16 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 4 thread ==="
-	OMP_NUM_TEAMS=32 OMP_TEAM_LIMIT=64 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 8 thread ==="
-	OMP_NUM_TEAMS=32 OMP_TEAM_LIMIT=128 perf stat -r 10 ./$(EXE)
-	@echo "=== Test con limit2 thread ==="
-	OMP_NUM_TEAMS=128 OMP_TEAM_LIMIT=4 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 2 thread ==="
-	OMP_NUM_TEAMS=128 OMP_TEAM_LIMIT=16 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 4 thread ==="
-	OMP_NUM_TEAMS=128 OMP_TEAM_LIMIT=64 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 8 thread ==="
-	OMP_NUM_TEAMS=128 OMP_TEAM_LIMIT=128 perf stat -r 10 ./$(EXE)
-	@echo ....................................................
-
-test10000g: $(EXE)
-	@echo ===================================================
-	@echo "Esecuzione EXTRALARGE_DATASET "
-	OMP_NUM_TEAMS=2 OMP_TEAM_LIMIT=4 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 2 thread ==="
-	OMP_NUM_TEAMS=2 OMP_TEAM_LIMIT=16 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 4 thread ==="
-	OMP_NUM_TEAMS=2 OMP_TEAM_LIMIT=64 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 8 thread ==="
-	OMP_NUM_TEAMS=2 OMP_TEAM_LIMIT=128 perf stat -r 10 ./$(EXE)
-	@echo "=== Test con limit2 thread ==="
-	OMP_NUM_TEAMS=4 OMP_TEAM_LIMIT=4 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 2 thread ==="
-	OMP_NUM_TEAMS=4 OMP_TEAM_LIMIT=16 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 4 thread ==="
-	OMP_NUM_TEAMS=4 OMP_TEAM_LIMIT=64 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 8 thread ==="
-	OMP_NUM_TEAMS=4 OMP_TEAM_LIMIT=128 perf stat -r 10 ./$(EXE)
-	@echo "=== Test con limit2 thread ==="
-	OMP_NUM_TEAMS=32 OMP_TEAM_LIMIT=4 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 2 thread ==="
-	OMP_NUM_TEAMS=32 OMP_TEAM_LIMIT=16 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 4 thread ==="
-	OMP_NUM_TEAMS=32 OMP_TEAM_LIMIT=64 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 8 thread ==="
-	OMP_NUM_TEAMS=32 OMP_TEAM_LIMIT=128 perf stat -r 10 ./$(EXE)
-	@echo "=== Test con limit2 thread ==="
-	OMP_NUM_TEAMS=128 OMP_TEAM_LIMIT=4 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 2 thread ==="
-	OMP_NUM_TEAMS=128 OMP_TEAM_LIMIT=16 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 4 thread ==="
-	OMP_NUM_TEAMS=128 OMP_TEAM_LIMIT=64 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 8 thread ==="
-	OMP_NUM_TEAMS=128 OMP_TEAM_LIMIT=128 perf stat -r 10 ./$(EXE)
 	@echo ....................................................
 
 
