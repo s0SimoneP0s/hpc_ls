@@ -14,7 +14,7 @@
 
 
 int num_teams_env = atoi(getenv("OMP_NUM_TEAMS"));
-int thread_limit_env = atoi(getenv("OMP_TEAMS_THREAD_LIMIT");)
+int thread_limit_env = atoi(getenv("OMP_TEAMS_THREAD_LIMIT"));
 
 
 /* Array initialization. */
