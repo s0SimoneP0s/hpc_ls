@@ -44,6 +44,11 @@ for i in "${test_size_list[@]}"; do
             threads="${BASH_REMATCH[1]}"
         fi
 
+        # gpu_teams
+        if [[ "$line" =~ ^Teams: $ ]]; then
+            gpu_teams="${BASH_REMATCH[1]}"
+        fi
+
         # insn per cycle
         if [[ "$line" =~ instructions.*#[[:space:]]+([0-9]+)[,.]([0-9]+)[[:space:]]+insn\ per\ cycle ]]; then
             insn_per_cycle="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}"
