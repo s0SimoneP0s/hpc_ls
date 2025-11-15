@@ -56,18 +56,12 @@ run: $(EXE)
 	@echo "Esecuzione con $(THREADS) thread..."
 	OMP_NUM_THREADS=$(THREADS) perf stat -r 10 ./$(EXE)
 
-# Esegui test per dataset specifici
+
 test_mini: $(EXE)
 	@echo ===================================================
 	@echo "Esecuzione MINI_DATASET "
 	@echo "=== Test con 1 thread ==="
 	OMP_NUM_THREADS=1 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 2 thread ==="
-	OMP_NUM_THREADS=2 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 4 thread ==="
-	OMP_NUM_THREADS=4 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 8 thread ==="
-	OMP_NUM_THREADS=8 perf stat -r 10 ./$(EXE)
 	@echo ....................................................
 
 test_small: $(EXE)
@@ -75,12 +69,6 @@ test_small: $(EXE)
 	@echo "Esecuzione SMALL_DATASET "
 	@echo "=== Test con 1 thread ==="
 	OMP_NUM_THREADS=1 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 2 thread ==="
-	OMP_NUM_THREADS=2 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 4 thread ==="
-	OMP_NUM_THREADS=4 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 8 thread ==="
-	OMP_NUM_THREADS=8 perf stat -r 10 ./$(EXE)
 	@echo ....................................................
 
 test_standard: $(EXE)
@@ -88,12 +76,6 @@ test_standard: $(EXE)
 	@echo "Esecuzione STANDARD_DATASET "
 	@echo "=== Test con 1 thread ==="
 	OMP_NUM_THREADS=1 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 2 thread ==="
-	OMP_NUM_THREADS=2 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 4 thread ==="
-	OMP_NUM_THREADS=4 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 8 thread ==="
-	OMP_NUM_THREADS=8 perf stat -r 10 ./$(EXE)
 	@echo ....................................................
 
 test_large: $(EXE)
@@ -101,12 +83,7 @@ test_large: $(EXE)
 	@echo "Esecuzione LARGE_DATASET "
 	@echo "=== Test con 1 thread ==="
 	OMP_NUM_THREADS=1 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 2 thread ==="
-	OMP_NUM_THREADS=2 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 4 thread ==="
-	OMP_NUM_THREADS=4 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 8 thread ==="
-	OMP_NUM_THREADS=8 perf stat -r 10 ./$(EXE)
+
 	@echo ....................................................
 
 test_extralarge: $(EXE)
@@ -114,13 +91,7 @@ test_extralarge: $(EXE)
 	@echo "Esecuzione EXTRALARGE_DATASET "
 	@echo "=== Test con 1 thread ==="
 	OMP_NUM_THREADS=1 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 2 thread ==="
-	OMP_NUM_THREADS=2 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 4 thread ==="
-	OMP_NUM_THREADS=4 perf stat -r 10 ./$(EXE)
-	@echo "\n=== Test con 8 thread ==="
-	OMP_NUM_THREADS=8 perf stat -r 10 ./$(EXE)
-	@echo ....................................................
+...........
 
 
 
