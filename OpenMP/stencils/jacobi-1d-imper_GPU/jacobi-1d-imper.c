@@ -67,6 +67,9 @@ static void kernel_jacobi_1d_imper(int tsteps,
   }
 }
 
+int omp_get_team_num(void);
+int omp_get_thread_limit(void);
+
 int main(int argc, char **argv)
 {
   /* Retrieve problem size. */
