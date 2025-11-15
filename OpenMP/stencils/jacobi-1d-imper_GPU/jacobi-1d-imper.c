@@ -120,11 +120,5 @@ int main(int argc, char **argv)
   /* Be clean. */
   POLYBENCH_FREE_ARRAY(A);
   POLYBENCH_FREE_ARRAY(B);
-
-    printf("Numero dispositivi: %d\n", omp_get_num_devices());
-    printf("Dispositivo default: %d\n", omp_get_default_device());
-    
-
-
   return 0;
 }
