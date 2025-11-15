@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <math.h>
+#include <stdlib.h>
 
 /* Include polybench common header. */
 #include <polybench.h>
