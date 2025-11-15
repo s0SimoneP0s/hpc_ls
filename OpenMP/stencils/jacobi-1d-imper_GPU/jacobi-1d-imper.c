@@ -79,6 +79,18 @@ int main(int argc, char **argv)
   int tsteps = TSTEPS;
   printf("n = %d\ntsteps = %d\n",n,tsteps);
 
+  #pragma omp target teams 
+  {
+      int nteams  = omp_get_num_teams();
+      #pragma omp parallel
+      {
+          #pragma omp single
+          {
+              printf("Teams: %d\nThread limit: %d\n",
+                     nteams, omp_get_thread_limit());
+          }
+      }
+  }
 
 
 
@@ -86,19 +98,7 @@ int main(int argc, char **argv)
   POLYBENCH_1D_ARRAY_DECL(A, DATA_TYPE, N, n);
   POLYBENCH_1D_ARRAY_DECL(B, DATA_TYPE, N, n);
 
-  #pragma omp target data map(tofrom: A[0:n], B[0:n])
-  {
 
-    #pragma omp target teams distribute num_teams(2) thread_limit(6)
-    for(int i = 0; i < 2; i++) 
-    {
-        int team_num = omp_get_team_num();
-        int thread_limit = omp_get_thread_limit();
-        
-        printf("Iterazione %d eseguita dal Team %d, Thread limit: %d\n", 
-              i, team_num, thread_limit);
-    }
-  }
 
 
   /* Initialize array(s). */
