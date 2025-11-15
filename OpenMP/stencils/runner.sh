@@ -1,15 +1,17 @@
 #!/bin/bash
 
-echo "# plot vanilla"
+# Stampa intestazione CSV una sola volta
+echo "dataset,n,tsteps,threads,seconds_time_elapsed,insn_per_cycle,branch_misses"
+
 cd jacobi-1d-imper_vanilla
 ./plotter.sh
 cd ..
 
-echo "# plot CPU"
 cd jacobi-1d-imper_CPU
 ./plotter.sh
 cd ..
 
-echo "# plot GPU"
 cd jacobi-1d-imper_GPU
 ./plotter.sh
+
+

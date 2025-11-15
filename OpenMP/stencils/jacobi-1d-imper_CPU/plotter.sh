@@ -26,10 +26,10 @@ for i in "${test_size_list[@]}"; do
     # Valori noti dal Makefile (puoi adattarli se vuoi)
     case "$i" in
         test_mini_C)    n=500; tsteps=2 ;;
-        test_small)   n=1000; tsteps=10 ;;
-        test_standard)  n=10000; tsteps=100 ;;
-        test_large) n=100000; tsteps=1000 ;;
-        test_extralarge) n=1000000; tsteps=1000 ;;
+        test_small_C)   n=1000; tsteps=10 ;;
+        test_standard_C)  n=10000; tsteps=100 ;;
+        test_large_C) n=100000; tsteps=1000 ;;
+        test_extralarge_C) n=1000000; tsteps=1000 ;;
         *) n=0; tsteps=0 ;;
     esac
 

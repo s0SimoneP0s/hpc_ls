@@ -1,6 +1,6 @@
 #!/bin/bash
 # Script cumulativo per estrarre dati da output perf e convertirli in CSV
-# Uso: ./parse_perf.sh > output.csv
+
 
 # Funzione per formattare numeri
 format_number() {
@@ -13,20 +13,18 @@ format_number() {
 # Lista dei test dataset da eseguire
 declare -a test_size_list=("test_mini_G" "test_small_G" "test_standard_G" "test_large_G" "test_extralarge_G")
 
-# Stampa intestazione CSV una sola volta
-echo "dataset,n,tsteps,threads,seconds_time_elapsed,insn_per_cycle,branch_misses"
+
 
 # Loop su tutti i dataset
 for i in "${test_size_list[@]}"; do
-    #echo "=== Esecuzione ${i} ===" >&2
 
     # Esegui make e salva l'output
     make "$i" > "input_${i}.txt" 2>&1
 
     # Valori noti dal Makefile (puoi adattarli se vuoi)
     case "$i" in
-        test_mini)    n=500; tsteps=2 ;;
-        test10)   n=1000; tsteps=10 ;;
+        test_mini_G)    n=500; tsteps=2 ;;
+        test_small_G)   n=1000; tsteps=10 ;;
         test_standard_G)  n=10000; tsteps=100 ;;
         test_large_G) n=100000; tsteps=1000 ;;
         test_extralarge_G) n=1000000; tsteps=1000 ;;
