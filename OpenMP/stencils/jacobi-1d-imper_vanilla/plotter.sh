@@ -69,5 +69,6 @@ for i in "${test_size_list[@]}"; do
             branch_misses=""
         fi
     done < "input_${i}.txt"
+    rm jacobi-1d-imper_omp
 done
 rm input_*.txt

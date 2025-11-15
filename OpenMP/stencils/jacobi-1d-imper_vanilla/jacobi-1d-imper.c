@@ -66,7 +66,11 @@ int main(int argc, char **argv)
   int n = N;
   int tsteps = TSTEPS;
   printf("n = %d\ntsteps = %d\n",n,tsteps);
-  
+  #pragma omp parallel 
+  {
+    #pragma omp single
+    printf("n = %d\ntsteps = %d\nthreads = %d\n", n, tsteps, omp_get_num_threads() );
+  }
   /* Variable declaration/allocation. */
   POLYBENCH_1D_ARRAY_DECL(A, DATA_TYPE, N, n);
   POLYBENCH_1D_ARRAY_DECL(B, DATA_TYPE, N, n);

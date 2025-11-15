@@ -78,7 +78,7 @@ int main(int argc, char **argv)
   	int devices = omp_get_num_devices();
   	int teams = omp_get_num_teams();
   	int thread_limit = omp_get_thread_limit();
-	printf("Devices: %d\nTeams: %d\nThread limit: %d\n",devices,teams,thread_limit);
+	  printf("Devices: %d\nTeams: %d\nThread limit: %d\n",devices,teams,thread_limit);
   }
 
   /* Variable declaration/allocation. */

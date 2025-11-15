@@ -71,6 +71,7 @@ int main(int argc, char **argv)
     #pragma omp single
     printf("n = %d\ntsteps = %d\nthreads = %d\n", n, tsteps, omp_get_num_threads() );
   }
+  
   /* Variable declaration/allocation. */
   POLYBENCH_1D_ARRAY_DECL(A, DATA_TYPE, N, n);
   POLYBENCH_1D_ARRAY_DECL(B, DATA_TYPE, N, n);
