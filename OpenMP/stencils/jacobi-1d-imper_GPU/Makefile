@@ -17,7 +17,7 @@ HEADERS = $(BENCHMARK).h $(UTIL_DIR)/polybench.h
 TIMING = -DPOLYBENCH_TIME
 
 # Imposta il dataset in base al target
-ifeq ($(MAKECMDGOALS),test2)
+ifeq ($(MAKECMDGOALS),test_mini)
 	DATASET = -DMINI_DATASET
 endif
 ifeq ($(MAKECMDGOALS),test10)
@@ -34,7 +34,7 @@ ifeq ($(MAKECMDGOALS),test10000)
 endif
 
 
-ifeq ($(MAKECMDGOALS),test2g)
+ifeq ($(MAKECMDGOALS),test_minig)
 	DATASET = -DMINI_DATASET
 endif
 ifeq ($(MAKECMDGOALS),test10g)
@@ -57,7 +57,7 @@ DATASET ?= -DSTANDARD_DATASET
 # Combina tutte le flags
 CFLAGS += $(DATASET) $(TIMING)
 
-.PHONY: all clean run test2 test10 test100 test1000 test10000
+.PHONY: all clean run test_mini test10 test100 test1000 test10000
 
 all: $(EXE)
 
@@ -73,7 +73,7 @@ run: $(EXE)
 	OMP_NUM_THREADS=$(THREADS) perf stat -r 10 ./$(EXE)
 
 # Esegui test per dataset specifici
-test2: $(EXE)
+test_mini: $(EXE)
 	@echo ===================================================
 	@echo "Esecuzione MINI_DATASET "
 	@echo "=== Test con 1 thread ==="
@@ -140,7 +140,7 @@ test10000: $(EXE)
 
 #-------------------GPU-----------------------------------------
 
-test2g: $(EXE)
+test_minig: $(EXE)
 	@echo ===================================================
 	@echo "Esecuzione MINI_DATASET "
 	OMP_NUM_TEAMS=2 OMP_TEAM_LIMIT=4 perf stat -r 10 ./$(EXE)

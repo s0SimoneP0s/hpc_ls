@@ -11,7 +11,7 @@ format_number() {
 }
 
 # Lista dei test dataset da eseguire
-declare -a test_size_list=("test2" "test10" "test100" "test1000" "test10000")
+declare -a test_size_list=("test_mini" "test_small" "test_standard" "test_large" "test_extralarge")
 
 
 # Stampa intestazione CSV una sola volta
@@ -26,11 +26,11 @@ for i in "${test_size_list[@]}"; do
 
     # Valori noti dal Makefile (puoi adattarli se vuoi)
     case "$i" in
-        test2)    n=500; tsteps=2 ;;
-        test10)   n=1000; tsteps=10 ;;
-        test100)  n=10000; tsteps=100 ;;
-        test1000) n=100000; tsteps=1000 ;;
-        test10000) n=1000000; tsteps=1000 ;;
+        test_mini)    n=500; tsteps=2 ;;
+        test_small)   n=1000; tsteps=10 ;;
+        test_standard)  n=10000; tsteps=100 ;;
+        test_large) n=100000; tsteps=1000 ;;
+        test_extralarge) n=1000000; tsteps=1000 ;;
         *) n=0; tsteps=0 ;;
     esac
 
