@@ -11,8 +11,8 @@
 #include "jacobi-1d-imper.h"
 
 
-#define THREADS_GPU 64
-#define THREADS_CPU 4
+// #define THREADS_GPU 64
+// #define THREADS_CPU 4
 
 
 /* Array initialization. */
@@ -73,18 +73,17 @@ int main(int argc, char **argv)
   int n = N;
   int tsteps = TSTEPS;
   printf("n = %d\ntsteps = %d\n",n,tsteps);
-    #pragma omp target teams
+    #pragma omp target teams(16)
     {
         #pragma omp parallel
         {
             #pragma omp single
             {
-                int num_teams = omp_get_num_teams();
+                //int num_teams = omp_get_num_teams();
                 int team_num = omp_get_team_num();
                 int thread_limit = omp_get_thread_limit();
-                int num_threads = omp_get_num_threads();
-                printf("Teams: %d\nThread limit: %d\nNum Treads: %d\n",
-                          num_teams,thread_limit,num_threads);
+                printf("Teams: %d\nThread limit: %d\n",
+                          num_teams,thread_limit);
             }
         }
     }
