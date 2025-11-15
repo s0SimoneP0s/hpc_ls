@@ -60,6 +60,11 @@ static void kernel_jacobi_1d_imper(int tsteps,
                                    DATA_TYPE POLYBENCH_1D(B, N, n)
                                    )
 
+  char* num_teams_env = getenv("OMP_NUM_TEAMS");
+  char* thread_limit_env = getenv("OMP_TEAMS_THREAD_LIMIT");
+  printf("Teams: %s\nThread limit: %d\n",num_teams_env,thread_limit_env);
+
+  
 {
   int t, i, j;
   #pragma omp target data map(tofrom: A[0:n], B[0:n])
@@ -92,8 +97,7 @@ int main(int argc, char **argv)
   POLYBENCH_1D_ARRAY_DECL(A, DATA_TYPE, N, n);
   POLYBENCH_1D_ARRAY_DECL(B, DATA_TYPE, N, n);
 
-    char* num_teams_env = getenv("OMP_NUM_TEAMS");
-    char* thread_limit_env = getenv("OMP_TEAMS_THREAD_LIMIT");
+
 
 
   /* Initialize array(s). */
