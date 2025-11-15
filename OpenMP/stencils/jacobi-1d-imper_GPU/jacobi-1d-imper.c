@@ -76,7 +76,7 @@ int main(int argc, char **argv)
   int n = N;
   int tsteps = TSTEPS;
   printf("n = %d\ntsteps = %d\n",n,tsteps);
-    #pragma omp target teams(16)
+    #pragma omp target teams distribute num_teams thread_limit
     {
         #pragma omp parallel
         {
