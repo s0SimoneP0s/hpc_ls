@@ -2,7 +2,6 @@
 #include <unistd.h>
 #include <string.h>
 #include <math.h>
-#include <stdlib.h>
 
 /* Include polybench common header. */
 #include <polybench.h>
@@ -13,10 +12,9 @@
 
 
 
-char * tmp1=getenv("OMP_NUM_TEAMS");
-int num_teams_env = (int)tmp1;
-char * tmp2=getenv("OMP_TEAMS_THREAD_LIMIT");
-int thread_limit_env = (int)tmp2;
+
+int num_teams_env = atoi(getenv("OMP_NUM_TEAMS"));
+int thread_limit_env = atoi(getenv("OMP_TEAMS_THREAD_LIMIT");)
 
 
 /* Array initialization. */
@@ -72,6 +70,9 @@ static void kernel_jacobi_1d_imper(int tsteps,
   }
 }
 
+int omp_get_team_num(void);
+int omp_get_thread_limit(void);
+int omp_get_num_teams(void);
 
 int main(int argc, char **argv)
 {
@@ -86,9 +87,6 @@ int main(int argc, char **argv)
   /* Variable declaration/allocation. */
   POLYBENCH_1D_ARRAY_DECL(A, DATA_TYPE, N, n);
   POLYBENCH_1D_ARRAY_DECL(B, DATA_TYPE, N, n);
-
-
-    
 
 
   /* Initialize array(s). */
