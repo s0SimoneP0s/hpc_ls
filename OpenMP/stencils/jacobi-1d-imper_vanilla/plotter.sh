@@ -14,9 +14,6 @@ format_number() {
 declare -a test_size_list=("test_mini" "test_small" "test_standard" "test_large" "test_extralarge")
 
 
-# Stampa intestazione CSV una sola volta
-echo "dataset,n,tsteps,threads,seconds_time_elapsed,insn_per_cycle,branch_misses"
-
 # Loop su tutti i dataset
 for i in "${test_size_list[@]}"; do
     #echo "=== Esecuzione ${i} ===" >&2
