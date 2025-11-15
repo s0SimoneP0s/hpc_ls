@@ -8,7 +8,7 @@
 
 /* Include benchmark-specific header. */
 /* Default data type is double, default size is 100x10000. */
-#include "../jacobi-1d-imper.h"
+#include "jacobi-1d-imper.h"
 
 /* Array initialization. */
 static void init_array(int n,
@@ -49,16 +49,13 @@ static void kernel_jacobi_1d_imper(int tsteps,
                                    DATA_TYPE POLYBENCH_1D(B, N, n))
 {
   int t, i, j;
-  #pragma omp parallel private(i,j) 
+
   for (t = 0; t < _PB_TSTEPS; t++)
   {
-    #pragma omp for schedule(static) 
     for (i = 1; i < _PB_N - 1; i++)
       B[i] = 0.33333 * (A[i - 1] + A[i] + A[i + 1]);
-      
 
-    #pragma omp for schedule(static) 
-    for (j = 1; j < _PB_N - 1; j++) 
+    for (j = 1; j < _PB_N - 1; j++)
       A[j] = B[j];
   }
 }
@@ -68,13 +65,6 @@ int main(int argc, char **argv)
   /* Retrieve problem size. */
   int n = N;
   int tsteps = TSTEPS;
-
-  
-#pragma omp parallel 
-{
-	#pragma omp single
-	printf("n = %d\ntsteps = %d\nthreads = %d\n", n, tsteps, omp_get_num_threads() );
-}
 
   /* Variable declaration/allocation. */
   POLYBENCH_1D_ARRAY_DECL(A, DATA_TYPE, N, n);
@@ -87,7 +77,7 @@ int main(int argc, char **argv)
   polybench_start_instruments;
 
   /* Run kernel. */
- // kernel_jacobi_1d_imper(tsteps, n, POLYBENCH_ARRAY(A), POLYBENCH_ARRAY(B));
+  kernel_jacobi_1d_imper(tsteps, n, POLYBENCH_ARRAY(A), POLYBENCH_ARRAY(B));
 
   /* Stop and print timer. */
   polybench_stop_instruments;
@@ -95,11 +85,11 @@ int main(int argc, char **argv)
 
   /* Prevent dead-code elimination. All live-out data must be printed
      by the function call in argument. */
-  ///polybench_prevent_dce(print_array(n, POLYBENCH_ARRAY(A)));
+  polybench_prevent_dce(print_array(n, POLYBENCH_ARRAY(A)));
 
   /* Be clean. */
   POLYBENCH_FREE_ARRAY(A);
   POLYBENCH_FREE_ARRAY(B);
-  //print_array(n, POLYBENCH_ARRAY(A)); 
+
   return 0;
 }
