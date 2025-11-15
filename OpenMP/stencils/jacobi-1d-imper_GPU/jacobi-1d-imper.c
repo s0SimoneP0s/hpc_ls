@@ -92,20 +92,16 @@ int main(int argc, char **argv)
   POLYBENCH_1D_ARRAY_DECL(A, DATA_TYPE, N, n);
   POLYBENCH_1D_ARRAY_DECL(B, DATA_TYPE, N, n);
 
-  #pragma omp target data map(tofrom: A[0:n], B[0:n])
-  {
-
-
-    #pragma omp target teams distribute num_teams(OMP_NUM_TEAMS) thread_limit(OMP_TEAM_LIMIT)
-    for(int i = 0; i < 2; i++) 
-    {
-        int team_num = omp_get_team_num();
-        int thread_limit = omp_get_thread_limit();
-        
-        printf("Iterazione %d eseguita dal Team %d, Thread limit: %d\n", 
-              i, team_num, thread_limit);
+    char* num_teams_env = getenv("OMP_NUM_TEAMS");
+    char* thread_limit_env = getenv("OMP_TEAMS_THREAD_LIMIT");
+    
+    printf("OMP_NUM_TEAMS=%s\n", num_teams_env ? num_teams_env : "non settata");
+    printf("OMP_TEAMS_THREAD_LIMIT=%s\n", thread_limit_env ? thread_limit_env : "non settata");
+    
+    #pragma omp target teams distribute
+    for(int i = 0; i < 2; i++) {
+        printf("Team %d\n", omp_get_team_num());
     }
-  }
 
 
   /* Initialize array(s). */
