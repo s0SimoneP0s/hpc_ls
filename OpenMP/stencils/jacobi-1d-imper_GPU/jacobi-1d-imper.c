@@ -95,6 +95,7 @@ int main(int argc, char **argv)
   #pragma omp target data map(tofrom: A[0:n], B[0:n])
   {
 
+
     #pragma omp target teams distribute num_teams(OMP_NUM_TEAMS) thread_limit(OMP_TEAM_LIMIT)
     for(int i = 0; i < 2; i++) 
     {
