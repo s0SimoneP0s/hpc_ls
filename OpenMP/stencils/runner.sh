@@ -3,7 +3,7 @@
 echo "# plot vanilla"
 cd jacobi-1d-imper_vanilla
 ./plotter.sh
-cd..
+cd ..
 
 echo "# plot CPU"
 cd jacobi-1d-imper_CPU
