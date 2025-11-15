@@ -83,8 +83,8 @@ int main(int argc, char **argv)
         {
             #pragma omp single
             {
-                ///int num_teams = omp_get_num_teams();
-                int team_num = omp_get_team_num();
+                int num_teams = omp_get_num_teams();
+                //int team_num = omp_get_team_num();
                 int thread_limit = omp_get_thread_limit();
                 printf("Teams: %d\nThread limit: %d\n",
                           num_teams,thread_limit);
