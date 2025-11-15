@@ -83,7 +83,7 @@ int main(int argc, char **argv)
                 int team_num = omp_get_team_num();
                 int thread_limit = omp_get_thread_limit();
                 printf("Teams: %d\nThread limit: %d\n",
-                          num_teams,thread_limit);
+                          team_num,thread_limit);
             }
         }
     }
