@@ -73,7 +73,7 @@ static void kernel_jacobi_1d_imper(int tsteps,
       #pragma omp target teams distribute parallel for simd \
                   num_teams(THREADS_CPU) thread_limit(THREADS_GPU) \
                   schedule(static) 
-      for (j = 1; i < _PB_N - 1; j++)
+      for (j = 1; j < _PB_N - 1; j++)
       {
         A[i] = B[i];
       }
