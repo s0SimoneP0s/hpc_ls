@@ -11,8 +11,7 @@ format_number() {
 }
 
 # Lista dei test dataset da eseguire
-#declare -a test_size_list=("test_mini" "test10" "test100" "test1000" "test10000")
-declare -a test_size_list=("test_minig" "test10g" "test100g" "test1000g" "test10000g")
+declare -a test_size_list=("test_minig" "test_small" "test_standard" "test_largeg" "test_extralargeg")
 
 # Stampa intestazione CSV una sola volta
 echo "dataset,n,tsteps,threads,seconds_time_elapsed,insn_per_cycle,branch_misses"
