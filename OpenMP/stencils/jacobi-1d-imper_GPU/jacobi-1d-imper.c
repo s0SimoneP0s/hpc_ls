@@ -79,7 +79,7 @@ int main(int argc, char **argv)
   int n = N;
   int tsteps = TSTEPS;
   printf("n = %d\ntsteps = %d\n",n,tsteps);
-  printf("Teams: %s\nThread limit: %d\n",num_teams_env,thread_limit_env);
+  printf("Teams: %s\nThread limit: %s\n",num_teams_env,thread_limit_env);
 
 
 
