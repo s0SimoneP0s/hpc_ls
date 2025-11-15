@@ -78,7 +78,7 @@ int main(int argc, char **argv)
   polybench_start_instruments;
 
   /* Run kernel. */
- // kernel_jacobi_1d_imper(tsteps, n, POLYBENCH_ARRAY(A), POLYBENCH_ARRAY(B));
+  kernel_jacobi_1d_imper(tsteps, n, POLYBENCH_ARRAY(A), POLYBENCH_ARRAY(B));
 
   /* Stop and print timer. */
   polybench_stop_instruments;
@@ -91,6 +91,6 @@ int main(int argc, char **argv)
   /* Be clean. */
   POLYBENCH_FREE_ARRAY(A);
   POLYBENCH_FREE_ARRAY(B);
-//  print_array(n, POLYBENCH_ARRAY(A)); 
+
   return 0;
 }
