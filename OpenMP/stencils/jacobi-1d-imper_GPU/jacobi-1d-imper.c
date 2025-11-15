@@ -11,6 +11,7 @@
 #include "jacobi-1d-imper.h"
 
 
+in tomp_get_num_devices(void);
 
 /* Array initialization. */
 static void init_array(int n,
