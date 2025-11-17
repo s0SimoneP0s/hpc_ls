@@ -74,7 +74,7 @@ static void kernel_jacobi_1d_imper(int tsteps,
                   schedule(static) 
       for (j = 1; j < _PB_N - 1; j++)
       {
-        A[i] = B[i];
+        A[j] = B[j];
       }
     }
   } 
