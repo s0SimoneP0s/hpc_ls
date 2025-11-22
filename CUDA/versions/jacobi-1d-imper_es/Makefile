@@ -6,8 +6,6 @@ endif
 UTIL_DIR = ../../utilities
 
 CC = gcc
-
-#CCFLAGS = -O2 -march=native -I$(UTIL_DIR)
 CCFLAGS = -O2 -I$(UTIL_DIR)
 
 
@@ -49,7 +47,7 @@ OBJS = $(SRC:.cu=.o) $(SRC:.c=.o)
 
 
 $(EXE):	$(OBJS)
-	$(NVCC) $(OBJS) -o $@ $(LDFLAGS)
+	$(NVCC) $(OBJS) -o $@ $(NVLDFLAGS)
 
 %.o: %.cu $(HEADERS)
 	$(NVCC) $(NVCFLAGS) -c $< -o $@
