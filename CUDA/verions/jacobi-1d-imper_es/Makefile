@@ -42,7 +42,7 @@ BENCHMARK = jacobi-1d-imper
 EXE = $(BENCHMARK)_cuda
 SRC = $(BENCHMARK).cu $(UTIL_DIR)/polybench.c
 HEADERS = $(BENCHMARK).h $(UTIL_DIR)/polybench.h
-
+OBJS = $(SRC:.cu=.o) $(SRC:.c=.o)
 
 
 $(EXE):	$(OBJS)
