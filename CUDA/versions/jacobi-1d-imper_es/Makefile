@@ -47,7 +47,7 @@ OBJS = $(SRC:.cu=.o) $(SRC:.c=.o)
 
 
 $(EXE):	$(OBJS)
-	$(NVCC) $(OBJS) -o $@ $(NVLDFLAGS)
+	$(NVCC) $(OBJS) -o $@ $(NVCFLAGS)
 
 %.o: %.cu $(HEADERS)
 	$(NVCC) $(NVCFLAGS) -c $< -o $@
