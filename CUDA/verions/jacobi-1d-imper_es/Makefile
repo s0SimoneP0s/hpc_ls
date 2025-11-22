@@ -1,24 +1,20 @@
+ifndef CUDA_HOME
+CUDA_HOME:=/usr/local/cuda
+endif
 
 # nvcc -arch=sm_53 -O2 jacobi-1d.c -o jacobi-1d -lpolybench
 UTIL_DIR = ../../utilities
 
-NVCC = nvcc
 CXX = g++
-NVARCH = -arch=sm_53 --ptxas-options=-v --use_fast_math
-CXXFLAGS = -O3 -march=native -I$(UTIL_DIR)
-NVCFLAGS = $(CXXFLAGS) $(NVARCH)
-NVLDFLAGS = -lm -lcudart
+CXXFLAGS = -O2 -march=native -I$(UTIL_DIR)
 
+NVCC=$(CUDA_HOME)/bin/nvcc
+NVOPT:=-Xcompiler -fopenmp -lineinfo -arch=sm_53 --ptxas-options=-v --use_fast_math
+NVCFLAGS = $(CXXFLAGS) $(NVOPT)
+LDFLAGS = -lm -lcudart
+NVLDFLAGS:=$(LDFLAGS) -lgomp
 
-BENCHMARK = jacobi-1d-imper
-EXE = $(BENCHMARK)_cuda
-SRC = $(BENCHMARK).cu $(UTIL_DIR)/polybench.c
-HEADERS = $(BENCHMARK).h $(UTIL_DIR)/polybench.h
-
-
-TIMING = -DPOLYBENCH_TIME
-
-# Imposta il dataset in base al target
+# choose dataset
 ifeq ($(MAKECMDGOALS),test_mini)
 	DATASET = -DMINI_DATASET
 endif
@@ -34,18 +30,36 @@ endif
 ifeq ($(MAKECMDGOALS),test_extralarge)
 	DATASET = -DEXTRALARGE_DATASET
 endif
-
-
+# default
 DATASET ?= -DSTANDARD_DATASET
 
+
+TIMING = -DPOLYBENCH_TIME
 NVCFLAGS += $(DATASET) $(TIMING)
+
+
+BENCHMARK = jacobi-1d-imper
+EXE = $(BENCHMARK)_cuda
+SRC = $(BENCHMARK).cu $(UTIL_DIR)/polybench.c
+HEADERS = $(BENCHMARK).h $(UTIL_DIR)/polybench.h
+
+
+
+$(EXE):	$(OBJS)
+	$(NVCC) $(OBJS) -o $@ $(LDFLAGS)
+
+%.o: %.cu $(HEADERS)
+	$(NVCC) $(NVCFLAGS) -c $< -o $@
+
+%.o: %.c $(HEADERS)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+
 
 .PHONY: all clean run test_mini test_small test_standard test_large test_extralarge
 
 all: $(EXE)
 
-$(EXE): $(SRC) $(HEADERS)
-	$(NVCC) $(NVCFLAGS) $(SRC) -o $@ $(NVLDFLAGS)
 
 clean:
 	rm -f $(EXE) *.o *~
