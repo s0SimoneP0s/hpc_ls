@@ -5,14 +5,15 @@ endif
 # nvcc -arch=sm_53 -O2 jacobi-1d.c -o jacobi-1d -lpolybench
 UTIL_DIR = ../../utilities
 
-CXX = g++
-#CXXFLAGS = -O2 -march=native -I$(UTIL_DIR)
-CXXFLAGS = -O2 -I$(UTIL_DIR)
+CC = gcc
+
+#CCFLAGS = -O2 -march=native -I$(UTIL_DIR)
+CCFLAGS = -O2 -I$(UTIL_DIR)
 
 
 NVCC=$(CUDA_HOME)/bin/nvcc
 NVOPT:=-Xcompiler -fopenmp -lineinfo -arch=sm_53 --ptxas-options=-v --use_fast_math
-NVCFLAGS = $(CXXFLAGS) $(NVOPT)
+NVCFLAGS = $(CCFLAGS) $(NVOPT)
 LDFLAGS = -lm -lcudart
 NVLDFLAGS:=$(LDFLAGS) -lgomp
 
@@ -54,7 +55,7 @@ $(EXE):	$(OBJS)
 	$(NVCC) $(NVCFLAGS) -c $< -o $@
 
 %.o: %.c $(HEADERS)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+	$(CC) $(CCFLAGS) -c $< -o $@
 
 
 
