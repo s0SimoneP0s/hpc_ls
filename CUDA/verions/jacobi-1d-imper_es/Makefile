@@ -6,10 +6,12 @@ endif
 UTIL_DIR = ../../utilities
 
 CXX = g++
-CXXFLAGS = -O2 -march=native -I$(UTIL_DIR)
+#CXXFLAGS = -O2 -march=native -I$(UTIL_DIR)
+CXXFLAGS = -O2 -I$(UTIL_DIR)
+
 
 NVCC=$(CUDA_HOME)/bin/nvcc
-NVOPT:=-Xcompiler -fopenmp -lineinfo -arch=sm_53 --ptxas-options=-v --use_fast_math
+NVOPT:=-Xcompiler -fopenmp -lineinfo -arch=sm_53 --ptxas-options=-v --use_fast_math -march=native
 NVCFLAGS = $(CXXFLAGS) $(NVOPT)
 LDFLAGS = -lm -lcudart
 NVLDFLAGS:=$(LDFLAGS) -lgomp
