@@ -11,7 +11,7 @@ CXXFLAGS = -O2 -I$(UTIL_DIR)
 
 
 NVCC=$(CUDA_HOME)/bin/nvcc
-NVOPT:=-Xcompiler -fopenmp -lineinfo -arch=sm_53 --ptxas-options=-v --use_fast_math -march=native
+NVOPT:=-Xcompiler -fopenmp -lineinfo -arch=sm_53 --ptxas-options=-v --use_fast_math
 NVCFLAGS = $(CXXFLAGS) $(NVOPT)
 LDFLAGS = -lm -lcudart
 NVLDFLAGS:=$(LDFLAGS) -lgomp
