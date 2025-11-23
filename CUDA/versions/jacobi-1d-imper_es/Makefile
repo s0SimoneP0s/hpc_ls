@@ -52,7 +52,7 @@ $(BUILD_DIR)/polybench.c.o: $(UTIL_DIR)/polybench.c
 all: $(EXECUTABLE)
 
 clean:
-	rm -f $(EXECUTABLE) *.o *~
+	rm -f $(EXECUTABLE) *.o *~ $(BUILD_DIR)/*.o
 
 run: $(EXECUTABLE)
 	@echo "Esecuzione del codice CUDA..."
