@@ -1,108 +1,48 @@
 ifndef CUDA_HOME
-CUDA_HOME:=/usr/local/cuda
+CUDA_HOME := /usr/local/cuda
 endif
 
-# nvcc -arch=sm_53 -O2 jacobi-1d.c -o jacobi-1d -lpolybench
 UTIL_DIR = ../../utilities
-
-CC = gcc
-CCFLAGS = -O2 -I$(UTIL_DIR)
-
-
-NVCC=$(CUDA_HOME)/bin/nvcc
-NVOPT:=-Xcompiler -fopenmp -lineinfo -arch=sm_53 --ptxas-options=-v --use_fast_math
-NVCFLAGS = $(CCFLAGS) $(NVOPT)
-LDFLAGS = -lm -lcudart
-NVLDFLAGS:=$(LDFLAGS) -lgomp
-
-# choose dataset
-ifeq ($(MAKECMDGOALS),test_mini)
-	DATASET = -DMINI_DATASET
-endif
-ifeq ($(MAKECMDGOALS),test_small)
-	DATASET = -DSMALL_DATASET
-endif
-ifeq ($(MAKECMDGOALS),test_standard)
-	DATASET = -DSTANDARD_DATASET
-endif
-ifeq ($(MAKECMDGOALS),test_large)
-	DATASET = -DLARGE_DATASET
-endif
-ifeq ($(MAKECMDGOALS),test_extralarge)
-	DATASET = -DEXTRALARGE_DATASET
-endif
-# default
-DATASET ?= -DSTANDARD_DATASET
-
-
-TIMING = -DPOLYBENCH_TIME
-NVCFLAGS += $(DATASET) $(TIMING)
-
-
 BENCHMARK = jacobi-1d-imper
-EXE = $(BENCHMARK)_cuda
-SRC = $(BENCHMARK).cu $(UTIL_DIR)/polybench.c
-HEADERS = $(BENCHMARK).h $(UTIL_DIR)/polybench.h
-OBJS = $(SRC:.cu=.o) $(SRC:.c=.o)
 
+# Dataset selection
+DATASET ?= -DSTANDARD_DATASET
+$(foreach size,mini small standard large extralarge,\
+  $(if $(filter test_$(size),$(MAKECMDGOALS)),$(eval DATASET=-D$(shell echo $(size) | tr a-z A-Z)_DATASET)))
 
-$(EXE):	$(OBJS)
-	$(NVCC) $(OBJS) -o $@ $(NVCFLAGS)
+# Compiler flags
+CFLAGS = -O2 -I$(UTIL_DIR) -DPOLYBENCH_TIME $(DATASET)
+NVCCFLAGS = -Xcompiler -fopenmp -lineinfo -arch=sm_53 --ptxas-options=-v --use_fast_math $(CFLAGS)
 
-%.o: %.cu $(HEADERS)
-	$(NVCC) $(NVCFLAGS) -c $< -o $@
+# Build
+$(BENCHMARK)_cuda: $(BENCHMARK).o polybench.o
+	$(CUDA_HOME)/bin/nvcc -dlink $^ -o $@ $(CFLAGS) -lm -lcudart -lgomp
 
-%.o: %.c $(HEADERS)
-	$(CC) $(CCFLAGS) -c $< -o $@
+%.o: %.cu $(BENCHMARK).h $(UTIL_DIR)/polybench.h
+	$(CUDA_HOME)/bin/nvcc $(NVCCFLAGS) -c $< -o $@
 
-
+polybench.o: $(UTIL_DIR)/polybench.c $(UTIL_DIR)/polybench.h
+	gcc $(CFLAGS) -c $< -o $@
 
 .PHONY: all clean run test_mini test_small test_standard test_large test_extralarge
 
-all: $(EXE)
-
+all: $(BENCHMARK)_cuda
 
 clean:
-	rm -f $(EXE) *.o *~
+	rm -f $(BENCHMARK)_cuda *.o *~
 
-run: $(EXE)
+run: $(BENCHMARK)_cuda
 	@echo "Esecuzione del codice CUDA..."
-	perf stat -r 10 ./$(EXE)
+	perf stat -r 10 ./$<
 
+test_mini test_small test_standard test_large test_extralarge: $(BENCHMARK)_cuda
+	@echo "==================================================="
+	@echo "Esecuzione $(patsubst test_%,%,$@)_DATASET"
+	perf stat -r 10 ./$<
+	@echo "...................................................."
 
-test_mini: $(EXE)
-	@echo ===================================================
-	@echo "Esecuzione MINI_DATASET "
-	perf stat -r 10 ./$(EXE) $(DATASET)
-	@echo ....................................................
+optimized: NVCCFLAGS += -O3 -ffast-math
+optimized: $(BENCHMARK)_cuda
 
-test_small: $(EXE)
-	@echo ===================================================
-	@echo "Esecuzione SMALL_DATASET "
-	perf stat -r 10 ./$(EXE) $(DATASET)
-	@echo ....................................................
-
-test_standard: $(EXE)
-	@echo ===================================================
-	@echo "Esecuzione STANDARD_DATASET "
-	perf stat -r 10 ./$(EXE) $(DATASET)
-	@echo ....................................................
-
-test_large: $(EXE)
-	@echo ===================================================
-	@echo "Esecuzione LARGE_DATASET "
-	perf stat -r 10 ./$(EXE) $(DATASET)
-	@echo ....................................................
-
-test_extralarge: $(EXE)
-	@echo ===================================================
-	@echo "Esecuzione EXTRALARGE_DATASET "
-	perf stat -r 10 ./$(EXE) $(DATASET)
-	@echo ....................................................
-
-
-optimized: NVCFLAGS += -O3 -ffast-math
-optimized: $(EXE)
-
-debug: NVCFLAGS = -g -O0 -I. -I$(UTIL_DIR) $(DATASET) $(TIMING)
-debug: $(EXE)
+debug: NVCCFLAGS = -g -O0 -I. -I$(UTIL_DIR) $(DATASET) -DPOLYBENCH_TIME
+debug: $(BENCHMARK)_cuda

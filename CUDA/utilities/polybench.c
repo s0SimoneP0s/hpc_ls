@@ -390,7 +390,7 @@ xmalloc (size_t num)
   return new;
 }
 
-
+#ifndef __CUDACC__
 void* polybench_alloc_data(unsigned long long int n, int elt_size)
 {
   /// FIXME: detect overflow!
@@ -400,3 +400,16 @@ void* polybench_alloc_data(unsigned long long int n, int elt_size)
 
   return ret;
 }
+
+#else
+void* polybench_alloc_data(unsigned long long int n, int elt_size)
+{
+  size_t val = n;
+  val *= elt_size;
+  void* ret = NULL;
+  
+  cudaMallocManaged(&ret, val);
+  
+  return ret;
+}
+#endif

@@ -1,3 +1,7 @@
+#ifndef __CUDACC__
+  #define __CUDACC__
+#endif
+
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
@@ -16,10 +20,11 @@
 #include "jacobi-1d-imper.h"
 
 
+
 /* Array initialization. */
 static void init_array(int n,
                        DATA_TYPE POLYBENCH_1D(A, N, n),
-                       DATA_TYPE POLYBENCH_1D(B, N, n))
+                       DATA_TYPE POLYBENCH_1D(B, N, n) )
 {
   int i;
 
@@ -28,7 +33,11 @@ static void init_array(int n,
     A[i] = ((DATA_TYPE)i + 2) / n;
     B[i] = ((DATA_TYPE)i + 3) / n;
   }
+
 }
+
+
+
 
 /* DCE code. Must scan the entire live-out data.
    Can be used also to check the correctness of the output. */
@@ -47,14 +56,19 @@ static void print_array(int n,
   fprintf(stderr, "\n");
 }
 
+#ifndef NUM_THREADS
+  #define NUM_THREADS 256 
+#endif
 
 #ifndef BLOCK_SIZE
-#define BLOCK_SIZE 256 
+  #define BLOCK_SIZE 256 
 #endif
 
 #ifndef TILE_WIDTH
-#define TILE_WIDTH (BLOCK_SIZE + 2)
+  #define TILE_WIDTH (BLOCK_SIZE + 2)
 #endif
+
+
 
 __global__ void jacobi_1d_kernel(DATA_TYPE *A, DATA_TYPE *B, int n)
 {
@@ -87,9 +101,7 @@ __global__ void jacobi_1d_kernel(DATA_TYPE *A, DATA_TYPE *B, int n)
   }
 }
 
-#ifndef NUM_THREADS
-#define NUM_THREADS 256 
-#endif
+
 
 void kernel_jacobi_1d_imper(int tsteps, int n, 
                            DATA_TYPE POLYBENCH_1D(A, N, n),
