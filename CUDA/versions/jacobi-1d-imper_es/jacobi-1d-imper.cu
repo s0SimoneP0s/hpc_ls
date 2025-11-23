@@ -56,17 +56,10 @@ static void print_array(int n,
   fprintf(stderr, "\n");
 }
 
-#ifndef NUM_THREADS
-  #define NUM_THREADS 256 
-#endif
 
-#ifndef BLOCK_SIZE
-  #define BLOCK_SIZE 256 
-#endif
-
-#ifndef TILE_WIDTH
-  #define TILE_WIDTH (BLOCK_SIZE + 2)
-#endif
+const int NUM_THREADS = 256; 
+const int BLOCK_SIZE = 256;
+const int TILE_WIDTH = (BLOCK_SIZE + 2);
 
 
 

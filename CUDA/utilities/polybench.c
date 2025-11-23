@@ -18,6 +18,11 @@
 #ifdef _OPENMP
 # include <omp.h>
 #endif
+#ifndef __CUDACC__
+  #define __CUDACC__
+  #include <cuda.h>
+  #include <cuda_runtime.h>
+#endif
 
 /* By default, collect PAPI counters on thread 0. */
 #ifndef POLYBENCH_THREAD_MONITOR
@@ -374,42 +379,28 @@ void polybench_timer_print()
 #endif
 }
 
-
-
 static
 void *
 xmalloc (size_t num)
 {
-  void* new = NULL;
-  int ret = posix_memalign (&new, 32, num);
-  if (! new || ret)
+  void* tmp = NULL;
+  int ret = posix_memalign (&tmp, 32, num);
+  if (! tmp || ret)
     {
       fprintf (stderr, "[PolyBench] posix_memalign: cannot allocate memory");
       exit (1);
     }
-  return new;
+  return tmp;
 }
 
-#ifndef __CUDACC__
-void* polybench_alloc_data(unsigned long long int n, int elt_size)
-{
-  /// FIXME: detect overflow!
-  size_t val = n;
-  val *= elt_size;
-  void* ret = xmalloc (val);
-
-  return ret;
-}
-
-#else
 void* polybench_alloc_data(unsigned long long int n, int elt_size)
 {
   size_t val = n;
   val *= elt_size;
   void* ret = NULL;
   
-  cudaMallocManaged(&ret, val);
+  /* cudaMallocManaged in C requires the flags parameter; use global attachment. */
+  cudaMallocManaged(&ret, val, cudaMemAttachGlobal);
   
   return ret;
 }
-#endif
