@@ -2,48 +2,68 @@ ifndef CUDA_HOME
 CUDA_HOME := /usr/local/cuda
 endif
 
+UTIL_DIR = ../../utilities
+BUILD_DIR ?= ./build
+MKDIR_P ?= mkdir -p
 
 CC=g++
-UTIL_DIR = ../../utilities
-BENCHMARK = jacobi-1d-imper
+NVCC := $(CUDA_HOME)/bin/nvcc
 
+BENCHMARK := jacobi-1d-imper.cu
+EXECUTABLE := $(BENCHMARK:.cu=_cuda)
+OBJ_FILES := $(BUILD_DIR)/$(BENCHMARK:.cu=.cu.o) $(BUILD_DIR)/polybench.c.o
 
 DATASET ?= -DSTANDARD_DATASET
 $(foreach size,mini small standard large extralarge,\
   $(if $(filter test_$(size),$(MAKECMDGOALS)),$(eval DATASET=-D$(shell echo $(size) | tr a-z A-Z)_DATASET)))
 
-## Ensure CUDA headers are available when compiling polybench.c with g++
-CCFLAGS = -O2 -I. -I$(UTIL_DIR) -I$(CUDA_HOME)/include -DPOLYBENCH_TIME $(DATASET)
-# Use explicit gencode for Tegra X1/Xavier style Maxwell GPUs (compute 5.3)
-# and ensure nvcc uses the system g++ as host compiler (ccbin).
-NVCCFLAGS = -Xcompiler -fopenmp -lineinfo --ptxas-options=-v --use_fast_math \
-	-gencode arch=compute_53,code=sm_53 -ccbin $(CC) $(CCFLAGS)
+# C flags
+CCFLAGS := -O2 -g -I. -I$(UTIL_DIR) $(EXT_CCFLAGS)
+NVCCFLAGS := -Xcompiler -fopenmp -lineinfo --ptxas-options=-v --use_fast_math \
+	-arch=sm_53 $(CCFLAGS)
+
+# linker flags
+CLFLAGS := -lm -lcudart $(EXT_CLFLAGS)
+NVCLFLAGS := $(CLFLAGS) -lgomp
 
 
-$(BENCHMARK)_cuda: $(BENCHMARK).o polybench.o
-	# Link the final host executable with nvcc (don't use -dlink here)
-	$(CUDA_HOME)/bin/nvcc $(NVCCFLAGS) $^ -o $@ -lm -lcudart -lgomp
+$(EXECUTABLE): $(OBJ_FILES)
+	$(MKDIR_P) $(dir $@)
+	$(NVCC) $(NVCCFLAGS) $(OBJ_FILES) -o $@ $(NVCLFLAGS)
 
-%.o: %.cu $(BENCHMARK).h $(UTIL_DIR)/polybench.h
-	$(CUDA_HOME)/bin/nvcc $(NVCCFLAGS) -c $< -o $@
+$(BUILD_DIR)/%.cu.o: %.cu
+	$(MKDIR_P) $(dir $@)
+	$(NVCC) $(NVCCFLAGS) -c $< -o $@
 
-polybench.o: $(UTIL_DIR)/polybench.c $(UTIL_DIR)/polybench.h
-	# Compile polybench.c with the C++ compiler so symbols match C++ linkage
-	$(CUDA_HOME)/bin/nvcc $(NVCCFLAGS) -c $< -o $@
+$(BUILD_DIR)/%.cpp.o: %.cpp
+	$(MKDIR_P) $(dir $@)
+	$(CC) $(CCFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/%.c.o: %.c
+	$(MKDIR_P) $(dir $@)
+	$(CC) $(CCFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/polybench.c.o: $(UTIL_DIR)/polybench.c
+	$(MKDIR_P) $(dir $@)
+	$(NVCC) -x cu $(CCFLAGS) -c $< -o $@
 
 .PHONY: all clean run test_mini test_small test_standard test_large test_extralarge
 
-all: $(BENCHMARK)_cuda
+all: $(EXECUTABLE)
 
 clean:
-	rm -f $(BENCHMARK)_cuda *.o *~
+	rm -f $(EXECUTABLE) *.o *~
 
-run: $(BENCHMARK)_cuda
+run: $(EXECUTABLE)
 	@echo "Esecuzione del codice CUDA..."
 	chmod +x $<
 	perf stat -r 10 ./$<
 
-test_mini test_small test_standard test_large test_extralarge: $(BENCHMARK)_cuda
+profile: $(EXECUTABLE)
+	chmod +x $<
+	$(CUDA_HOME)/bin/nvprof ./$(EXECUTABLE)
+
+test_mini test_small test_standard test_large test_extralarge: $(EXECUTABLE)
 	@echo "==================================================="
 	@echo "Esecuzione $(patsubst test_%,%,$@)_DATASET"
 	chmod +x $<
@@ -51,7 +71,7 @@ test_mini test_small test_standard test_large test_extralarge: $(BENCHMARK)_cuda
 	@echo "...................................................."
 
 optimized: NVCCFLAGS += -O3 -ffast-math
-optimized: $(BENCHMARK)_cuda
+optimized: $(EXECUTABLE)
 
 debug: NVCCFLAGS = -g -O0 -I. -I$(UTIL_DIR) $(DATASET) -DPOLYBENCH_TIME
-debug: $(BENCHMARK)_cuda
+debug: $(EXECUTABLE)
