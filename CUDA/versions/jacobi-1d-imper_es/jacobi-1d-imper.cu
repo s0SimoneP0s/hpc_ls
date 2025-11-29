@@ -54,7 +54,6 @@ static void print_array(int n,
 __global__ void jacobi_1d_kernel(DATA_TYPE *A, DATA_TYPE *B, int n )
 {
 
-  
   int tx = threadIdx.x;
   int global_i = blockIdx.x * blockDim.x + tx;
   

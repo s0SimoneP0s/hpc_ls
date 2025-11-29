@@ -33,9 +33,15 @@ for i in "${test_size_list[@]}"; do
     branch_misses=""
 
     while IFS= read -r line; do
+
         # threads
-        if [[ "$line" =~ ^===\ Test\ con\ ([0-9]+)\ thread ]]; then
+        if [[ "$line" =~ ^Threads: ([0-9]+) ]]; then
             threads="${BASH_REMATCH[1]}"
+        fi
+
+        # block size
+        if [[ "$line" =~ ^Block Size: ([0-9]+) ]]; then
+            b_size="${BASH_REMATCH[1]}"
         fi
 
         # insn per cycle
@@ -55,7 +61,7 @@ for i in "${test_size_list[@]}"; do
             time_elapsed=$(format_number "${BASH_REMATCH[1]}")
 
             # print csv
-            echo "${i},${n},${tsteps},${threads:-0},${time_elapsed:-0},${insn_per_cycle:-0},${branch_misses:-0},${gpu_teams:-0},${gpu_threads_per_team:-0}"
+            echo "${i},${n},${tsteps},${threads:-0},${b_size:-0},${time_elapsed:-0},${insn_per_cycle:-0},${branch_misses:-0},${gpu_teams:-0},${gpu_threads_per_team:-0}"
 
             # Reset
             time_elapsed=""
