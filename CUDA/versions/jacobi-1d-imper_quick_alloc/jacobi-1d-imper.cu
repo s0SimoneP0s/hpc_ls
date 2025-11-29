@@ -54,31 +54,15 @@ static void print_array(int n,
 __global__ void jacobi_1d_kernel(DATA_TYPE *A, DATA_TYPE *B, int n )
 {
 
-  int tx = threadIdx.x;
-  int global_i = blockIdx.x * blockDim.x + tx;
-  
-  // target element
-  if (global_i < n) {
-    B[tx + 1] = A[global_i];
-  }
-  
-  // -1 halo
-  if (tx == 0 && blockIdx.x > 0) {
-    B[0] = A[global_i - 1];
-  }
-  
-  // +1 halo
-  if (tx == blockDim.x - 1 && global_i < n - 1) {
-    B[tx + 2] = A[global_i + 1];
-  }
+  int i = blockIdx.x * blockDim.x + threadIdx.x; 
+
+    if (i > 0 && i < n - 1) 
+    {
+        B[i] = 0.33333 * (A[i - 1] + A[i] + A[i + 1]);
+    }
   
   __syncthreads();
   
-  // cumpute
-  if (global_i > 0 && global_i < n - 1 && tx < blockDim.x) {
-    DATA_TYPE neighbor_sum = B[tx] + B[tx + 1] + B[tx + 2];
-    B[global_i] = 0.33333 * neighbor_sum;
-  }
 }
 
 __global__ void myCudaMemcpy(DATA_TYPE *A, DATA_TYPE *B, const int n) {
@@ -98,8 +82,8 @@ void kernel_jacobi_1d_imper(int tsteps, int n,
   for (int t = 0; t < tsteps; t++) {
     jacobi_1d_kernel<<<numBlocks, numThreads>>>(A, B, n); // UVM only
     cudaDeviceSynchronize();
-    //cudaMemcpy(POLYBENCH_ARRAY(A), POLYBENCH_ARRAY(B), n * sizeof(DATA_TYPE), cudaMemcpyDeviceToDevice);
-    myCudaMemcpy<<<numBlocks, numThreads>>>(A, B, n); 
+    cudaMemcpy(POLYBENCH_ARRAY(A), POLYBENCH_ARRAY(B), n * sizeof(DATA_TYPE), cudaMemcpyDeviceToDevice);
+    //myCudaMemcpy<<<numBlocks, numThreads>>>(A, B, n); 
     cudaDeviceSynchronize();
   }
 }
