@@ -6,3 +6,13 @@ cd jacobi-1d-imper_es
 ./plotter.sh
 cd ..
 
+
+
+
+
+cd jacobi-1d-imper_quick_alloc
+./plotter.sh
+cd ..
+
+
+
