@@ -67,7 +67,18 @@ test_mini test_small test_standard test_large test_extralarge: $(EXECUTABLE)
 	@echo "==================================================="
 	@echo "Esecuzione $(patsubst test_%,%,$@)_DATASET"
 	chmod +x $<
-	perf stat -r 10 ./$<
+	NUM_THREADS=128 BLOCK_SIZE=32 perf stat -r 10 ./$<
+	NUM_THREADS=128 BLOCK_SIZE=128 perf stat -r 10 ./$<
+	NUM_THREADS=128 BLOCK_SIZE=256 perf stat -r 10 ./$<
+	NUM_THREADS=128 BLOCK_SIZE=512 perf stat -r 10 ./$<
+	NUM_THREADS=256 BLOCK_SIZE=32 perf stat -r 10 ./$<
+	NUM_THREADS=256 BLOCK_SIZE=128 perf stat -r 10 ./$<
+	NUM_THREADS=256 BLOCK_SIZE=256 perf stat -r 10 ./$<
+	NUM_THREADS=256 BLOCK_SIZE=512 perf stat -r 10 ./$<
+	NUM_THREADS=512 BLOCK_SIZE=32 perf stat -r 10 ./$<
+	NUM_THREADS=512 BLOCK_SIZE=128 perf stat -r 10 ./$<
+	NUM_THREADS=512 BLOCK_SIZE=256 perf stat -r 10 ./$<
+	NUM_THREADS=512 BLOCK_SIZE=512 perf stat -r 10 ./$<
 	@echo "...................................................."
 
 optimized: NVCCFLAGS += -O3 -ffast-math

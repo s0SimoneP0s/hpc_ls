@@ -1,14 +1,11 @@
 #ifndef JACOBI_1D_IMPER_H
 # define JACOBI_1D_IMPER_H
 
-/* Default to STANDARD_DATASET. */
 # if !defined(MINI_DATASET) && !defined(SMALL_DATASET) && !defined(LARGE_DATASET) && !defined(EXTRALARGE_DATASET)
 #  define STANDARD_DATASET
 # endif
 
-/* Do not define anything if the user manually defines the size. */
 # if !defined(TSTEPS) && ! defined(N)
-/* Define the possible dataset sizes. */
 #  ifdef MINI_DATASET
 #   define TSTEPS 2
 #   define N 500
@@ -19,7 +16,7 @@
 #   define N 1000
 #  endif
 
-#  ifdef STANDARD_DATASET /* Default if unspecified. */
+#  ifdef STANDARD_DATASET 
 #   define TSTEPS 100
 #   define N 10000
 #  endif
@@ -33,7 +30,7 @@
 #   define TSTEPS 1000
 #   define N 1000000
 #  endif
-# endif /* !N */
+# endif 
 
 # define _PB_TSTEPS POLYBENCH_LOOP_BOUND(TSTEPS,tsteps)
 # define _PB_N POLYBENCH_LOOP_BOUND(N,n)

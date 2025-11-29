@@ -7,21 +7,18 @@
 #include <string.h>
 #include <math.h>
 
-/* Include polybench common header. */
 #include <polybench.h>
 
-
-/* Cuda libraries*/
 #include <cuda.h>
 #include <cuda_runtime.h>
 
-/* Include benchmark-specific header. */
-/* Default data type is double, default size is 100x10000. */
 #include "jacobi-1d-imper.h"
 
 
+int NUM_THREADS = atoi(getenv("NUM_THREADS"));
+int BLOCK_SIZE = atoi(getenv("BLOCK_SIZE"));
 
-/* Array initialization. */
+
 static void init_array(int n,
                        DATA_TYPE POLYBENCH_1D(A, N, n),
                        DATA_TYPE POLYBENCH_1D(B, N, n) )
@@ -36,11 +33,7 @@ static void init_array(int n,
 
 }
 
-
-
-
-/* DCE code. Must scan the entire live-out data.
-   Can be used also to check the correctness of the output. */
+/*CPU linear print*/
 static void print_array(int n,
                         DATA_TYPE POLYBENCH_1D(A, N, n))
 
@@ -57,48 +50,47 @@ static void print_array(int n,
 }
 
 
-const int NUM_THREADS = 256; 
-const int BLOCK_SIZE = 256;
-const int TILE_WIDTH = (BLOCK_SIZE + 2);
 
-
-
-__global__ void jacobi_1d_kernel(DATA_TYPE *A, DATA_TYPE *B, int n)
+__global__ void jacobi_1d_kernel(DATA_TYPE *A, DATA_TYPE *B, int n )
 {
-  __shared__ DATA_TYPE A_sh[TILE_WIDTH];
+
   
   int tx = threadIdx.x;
   int global_i = blockIdx.x * blockDim.x + tx;
   
   // target element
   if (global_i < n) {
-    A_sh[tx + 1] = A[global_i];
+    B[tx + 1] = A[global_i];
   }
   
   // -1 halo
   if (tx == 0 && blockIdx.x > 0) {
-    A_sh[0] = A[global_i - 1];
+    B[0] = A[global_i - 1];
   }
   
   // +1 halo
   if (tx == blockDim.x - 1 && global_i < n - 1) {
-    A_sh[tx + 2] = A[global_i + 1];
+    B[tx + 2] = A[global_i + 1];
   }
   
   __syncthreads();
   
   // cumpute
   if (global_i > 0 && global_i < n - 1 && tx < blockDim.x) {
-    DATA_TYPE neighbor_sum = A_sh[tx] + A_sh[tx + 1] + A_sh[tx + 2];
+    DATA_TYPE neighbor_sum = B[tx] + B[tx + 1] + B[tx + 2];
     B[global_i] = 0.33333 * neighbor_sum;
   }
 }
 
-
+__global__ void myCudaMemcpy(DATA_TYPE *A, DATA_TYPE *B, const int n) {
+    int i = blockIdx.x * blockDim.x + threadIdx.x;
+    if (i < n) A[i] = B[i];
+}
 
 void kernel_jacobi_1d_imper(int tsteps, int n, 
                            DATA_TYPE POLYBENCH_1D(A, N, n),
-                           DATA_TYPE POLYBENCH_1D(B, N, n))
+                           DATA_TYPE POLYBENCH_1D(B, N, n)
+                          )
 {
   dim3 numThreads(NUM_THREADS);
   int numBlocks = (n + NUM_THREADS - 1) / NUM_THREADS;
@@ -107,23 +99,21 @@ void kernel_jacobi_1d_imper(int tsteps, int n,
   for (int t = 0; t < tsteps; t++) {
     jacobi_1d_kernel<<<numBlocks, numThreads>>>(A, B, n); // UVM only
     cudaDeviceSynchronize();
-    // swap
-    DATA_TYPE *tmp = A;
-    A = B;
-    B = tmp;
+    //cudaMemcpy(POLYBENCH_ARRAY(A), POLYBENCH_ARRAY(B), n * sizeof(DATA_TYPE), cudaMemcpyDeviceToDevice);
+    myCudaMemcpy<<<numBlocks, numThreads>>>(A, B, n); 
+    cudaDeviceSynchronize();
   }
-  cudaDeviceSynchronize();
 }
 
 
 int main(int argc, char **argv)
 {
-  /* Retrieve problem size. */
-  int n = N;
-  int tsteps = TSTEPS;
-  printf("n = %d\ntsteps = %d\n", n, tsteps);
 
-  /* Variable declaration/allocation. */
+  int n = (int)N;
+  int tsteps = (int)TSTEPS;
+  printf("n = %d\ntsteps = %d\n", n, tsteps);
+  printf("Threads: %d\nBlock Size: %d\n",NUM_THREADS,BLOCK_SIZE);
+
   POLYBENCH_1D_ARRAY_DECL(A, DATA_TYPE, N, n);
   POLYBENCH_1D_ARRAY_DECL(B, DATA_TYPE, N, n);
 
@@ -131,19 +121,8 @@ int main(int argc, char **argv)
   init_array(n, POLYBENCH_ARRAY(A), POLYBENCH_ARRAY(B));
 
 
-  /* Start timer. */
-  polybench_start_instruments;
-
   /* Run kernel. */
   kernel_jacobi_1d_imper(tsteps, n, POLYBENCH_ARRAY(A), POLYBENCH_ARRAY(B));
-
-  /* Stop and print timer. */
-  polybench_stop_instruments;
-  polybench_print_instruments;
-
-  /* Prevent dead-code elimination. All live-out data must be printed
-     by the function call in argument. */
-  polybench_prevent_dce(print_array(n, POLYBENCH_ARRAY(A)));
 
   /* Be clean.  UVM for cuda*/
   POLYBENCH_FREE_ARRAY(A);

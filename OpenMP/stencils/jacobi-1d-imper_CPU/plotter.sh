@@ -1,8 +1,7 @@
 #!/bin/bash
-# Script cumulativo per estrarre dati da output perf e convertirli in CSV
+# Script perf to CSV
 # Uso: ./parse_perf.sh > output.csv
 
-# Funzione per formattare numeri
 format_number() {
     local num="$1"
     num="${num//./}"       # rimuove separatori di migliaia
@@ -10,18 +9,13 @@ format_number() {
     echo "$num"
 }
 
-# Lista dei test dataset da eseguire
 declare -a test_size_list=("test_mini_C" "test_small_C" "test_standard_C" "test_large_C" "test_extralarge_C")
 
 
-# Loop su tutti i dataset
 for i in "${test_size_list[@]}"; do
 
-
-    # Esegui make e salva l'output
     make "$i" > "input_${i}.txt" 2>&1
 
-    # Valori noti dal Makefile (puoi adattarli se vuoi)
     case "$i" in
         test_mini_C)    n=500; tsteps=2 ;;
         test_small_C)   n=1000; tsteps=10 ;;
@@ -31,13 +25,11 @@ for i in "${test_size_list[@]}"; do
         *) n=0; tsteps=0 ;;
     esac
 
-    # Variabili temporanee
     threads=""
     time_elapsed=""
     insn_per_cycle=""
     branch_misses=""
 
-    # Parsing file
     while IFS= read -r line; do
         # threads
         if [[ "$line" =~ ^===\ Test\ con\ ([0-9]+)\ thread ]]; then
@@ -60,7 +52,6 @@ for i in "${test_size_list[@]}"; do
         if [[ "$line" =~ ^[[:space:]]+([0-9]+[,.]?[0-9]+)[[:space:]]+seconds\ time\ elapsed ]]; then
             time_elapsed=$(format_number "${BASH_REMATCH[1]}")
 
-            # Stampa riga CSV
             echo "${i},${n},${tsteps},${threads:-0},${time_elapsed:-0},${insn_per_cycle:-0},${branch_misses:-0},${gpu_teams:-0},${gpu_threads_per_team:-0}"
 
             # Reset
