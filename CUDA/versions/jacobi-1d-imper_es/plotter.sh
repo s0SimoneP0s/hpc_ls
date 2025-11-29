@@ -4,8 +4,8 @@
 
 format_number() {
     local num="$1"
-    num="${num//./}"     
-    num="${num//,/.}"     
+    num="${num//,/\.}" # pointed decimal
+    num="$(echo -n "$num" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')" # skipwtsp
     echo "$num"
 }
 
@@ -35,12 +35,12 @@ for i in "${test_size_list[@]}"; do
     while IFS= read -r line; do
 
         # threads
-        if [[ "$line" =~ ^Threads: ([0-9]+) ]]; then
+        if [[ "$line" =~ ^Threads:\ ([0-9]+) ]]; then
             threads="${BASH_REMATCH[1]}"
         fi
 
         # block size
-        if [[ "$line" =~ ^Block Size: ([0-9]+) ]]; then
+        if [[ "$line" =~ ^Block\ Size:\ ([0-9]+) ]]; then
             b_size="${BASH_REMATCH[1]}"
         fi
 
@@ -56,8 +56,9 @@ for i in "${test_size_list[@]}"; do
             branch_misses="${BASH_REMATCH[1]}${BASH_REMATCH[2]}"
         fi
 
+
         # seconds time elapsed
-        if [[ "$line" =~ ^[[:space:]]+([0-9]+[,.]?[0-9]+)[[:space:]]+seconds\ time\ elapsed ]]; then
+        if [[ "$line" =~ ^[[:space:]]+([0-9]+[,.]?[0-9]+).*seconds\ time\ elapsed ]]; then
             time_elapsed=$(format_number "${BASH_REMATCH[1]}")
 
             # print csv
@@ -69,6 +70,6 @@ for i in "${test_size_list[@]}"; do
             branch_misses=""
         fi
     done < "input_${i}.txt"
-    rm jacobi-1d-imper_omp
+    rm jacobi-1d-imper_cuda
 done
 rm input_*.txt
