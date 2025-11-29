@@ -61,7 +61,7 @@ __global__ void jacobi_1d_kernel(DATA_TYPE *A, DATA_TYPE *B, int n )
         B[i] = 0.33333 * (A[i - 1] + A[i] + A[i + 1]);
     }
   
-  __syncthreads();
+  //__syncthreads();
   
 }
 
@@ -81,10 +81,10 @@ void kernel_jacobi_1d_imper(int tsteps, int n,
   // run
   for (int t = 0; t < tsteps; t++) {
     jacobi_1d_kernel<<<numBlocks, numThreads>>>(A, B, n); // UVM only
-    cudaDeviceSynchronize();
+    //cudaDeviceSynchronize();
     cudaMemcpy(POLYBENCH_ARRAY(A), POLYBENCH_ARRAY(B), n * sizeof(DATA_TYPE), cudaMemcpyDeviceToDevice);
     //myCudaMemcpy<<<numBlocks, numThreads>>>(A, B, n); 
-    cudaDeviceSynchronize();
+    //cudaDeviceSynchronize();
   }
 }
 
