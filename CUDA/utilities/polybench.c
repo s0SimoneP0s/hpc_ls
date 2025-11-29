@@ -23,8 +23,8 @@ void* polybench_alloc_data(unsigned long long int n, int elt_size)
   size_t val = n;
   val *= elt_size;
   void* ret = NULL;
-  
-  cudaMallocManaged(&ret, val, cudaMemAttachGlobal);
-
+  //cudaMalloc((void**)&ret, val);
+  //cudaMallocManaged(&ret, val, cudaMemAttachGlobal);
+  gpuErrchk(cudaMallocManaged((void **)&ret, val)); 
   return ret;
 }
