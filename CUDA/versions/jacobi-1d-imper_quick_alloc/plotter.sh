@@ -44,6 +44,12 @@ for i in "${test_size_list[@]}"; do
             b_size="${BASH_REMATCH[1]}"
         fi
 
+
+        # Kernel execution time
+        if [[ "$line" =~ ^Kernel\ execution\ time:\ ([0-9.]+) ]]; then
+            ket="${BASH_REMATCH[1]}"
+        fi
+
         # insn per cycle
         if [[ "$line" =~ instructions.*#[[:space:]]+([0-9]+)[,.]([0-9]+)[[:space:]]+insn\ per\ cycle ]]; then
             insn_per_cycle="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}"
@@ -56,13 +62,12 @@ for i in "${test_size_list[@]}"; do
             branch_misses="${BASH_REMATCH[1]}${BASH_REMATCH[2]}"
         fi
 
-
         # seconds time elapsed
         if [[ "$line" =~ ^[[:space:]]+([0-9]+[,.]?[0-9]+).*seconds\ time\ elapsed ]]; then
             time_elapsed=$(format_number "${BASH_REMATCH[1]}")
 
             # print csv
-            echo "${i},${n},${tsteps},${threads:-0},${b_size:-0},${time_elapsed:-0},${insn_per_cycle:-0},${branch_misses:-0},${gpu_teams:-0},${gpu_threads_per_team:-0}"
+            echo "${i},${n},${tsteps},${threads:-0},${b_size:-0},${time_elapsed:-0},${insn_per_cycle:-0},${branch_misses:-0},${gpu_teams:-0},${gpu_threads_per_team:-0},${ket:-0}"
 
             # Reset
             time_elapsed=""
@@ -70,6 +75,6 @@ for i in "${test_size_list[@]}"; do
             branch_misses=""
         fi
     done < "input_${i}.txt"
-    rm jacobi-1d-imper_cuda
+    rm jacobi-1d-imper_cuda build/*.o
 done
 rm input_*.txt

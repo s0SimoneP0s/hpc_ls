@@ -47,7 +47,7 @@ $(BUILD_DIR)/polybench.c.o: $(UTIL_DIR)/polybench.c
 	$(MKDIR_P) $(dir $@)
 	$(NVCC) -x cu $(CCFLAGS) -c $< -o $@
 
-.PHONY: all clean run test_mini test_small test_standard test_large test_extralarge
+.PHONY: all clean run test_mini_CU_es test_small_CU_es test_standard_CU_es test_large_CU_es test_extralarge_CU_es
 
 all: $(EXECUTABLE)
 
@@ -63,7 +63,7 @@ profile: $(EXECUTABLE)
 	chmod +x $<
 	$(CUDA_HOME)/bin/nvprof ./$(EXECUTABLE)
 
-test_mini test_small test_standard test_large test_extralarge: $(EXECUTABLE)
+test_mini_CU_es test_small_CU_es test_standard_CU_es test_large_CU_es test_extralarge_CU_es: $(EXECUTABLE)
 	@echo "==================================================="
 	@echo "Esecuzione $(patsubst test_%,%,$@)_DATASET"
 	chmod +x $<
