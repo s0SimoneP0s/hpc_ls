@@ -6,8 +6,6 @@ source ../../../utils/plotter_utils.sh
 
 declare -a test_size_list=("test_mini_CU_es" "test_small_CU_es" "test_standard_CU_es" "test_large_CU_es" "test_extralarge_CU_es")
 
-touch jacobi-1d-imper_cuda
-rm jacobi-1d-imper_cuda build/*.o || true
 
 for i in "${test_size_list[@]}"; do
 
@@ -25,6 +23,6 @@ for i in "${test_size_list[@]}"; do
 
     process_input "input_${i}.txt" "$i" "$n" "$tsteps"
 
-    rm jacobi-1d-imper_cuda build/*.o
+
 done
 rm input_*.txt
