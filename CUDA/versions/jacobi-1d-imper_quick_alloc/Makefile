@@ -2,7 +2,7 @@ ifndef CUDA_HOME
 CUDA_HOME := /usr/local/cuda
 endif
 
-TIME_UTIL_DIR = ../../elapsed_utils
+TIME_UTIL_DIR = ../../../utils
 UTIL_DIR = ../../utilities
 BUILD_DIR ?= ./build
 MKDIR_P ?= mkdir -p
