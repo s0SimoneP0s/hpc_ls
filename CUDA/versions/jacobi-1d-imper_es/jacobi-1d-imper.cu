@@ -8,6 +8,7 @@
 #include <math.h>
 
 #include <polybench.h>
+#include <elapsed.h>
 
 #include <cuda.h>
 #include <cuda_runtime.h>
@@ -96,7 +97,10 @@ void kernel_jacobi_1d_imper(int tsteps, int n,
   
   // run
   for (int t = 0; t < tsteps; t++) {
+    start_timer();
     jacobi_1d_kernel<<<numBlocks, numThreads>>>(A, B, n); // UVM only
+    stop_timer();
+    print_elapsed_ms("SAXPY execution time");
     cudaDeviceSynchronize();
     //cudaMemcpy(POLYBENCH_ARRAY(A), POLYBENCH_ARRAY(B), n * sizeof(DATA_TYPE), cudaMemcpyDeviceToDevice);
     myCudaMemcpy<<<numBlocks, numThreads>>>(A, B, n); 
