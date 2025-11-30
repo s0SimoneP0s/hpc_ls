@@ -34,6 +34,11 @@ for i in "${test_size_list[@]}"; do
 
     while IFS= read -r line; do
 
+        # threads
+        if [[ "$line" =~ ^===\ Test\ con\ ([0-9]+)\ thread ]]; then
+            threads="${BASH_REMATCH[1]}"
+        fi
+
 
         # gpu_teams
         if [[ "$line" =~ ^Teams:[[:space:]]+([0-9]+) ]]; then
@@ -46,9 +51,9 @@ for i in "${test_size_list[@]}"; do
         fi
 
 
-        # threads
+        # cuda_threads
         if [[ "$line" =~ ^Threads:\ ([0-9]+) ]]; then
-            threads="${BASH_REMATCH[1]}"
+            cuda_threads="${BASH_REMATCH[1]}"
         fi
 
         # block size
@@ -84,7 +89,7 @@ for i in "${test_size_list[@]}"; do
             time_elapsed=$(format_number "${BASH_REMATCH[1]}")
 
             # print csv
-            echo "${i},${n},${tsteps},${threads:-0},${b_size:-0},${time_elapsed:-0},${insn_per_cycle:-0},${branch_misses:-0},${gpu_teams:-0},${gpu_threads_per_team:-0},${ket:-0},${saxpy:-0}"
+            echo "${i},${n},${tsteps},${threads:-0},${b_size:-0},${time_elapsed:-0},${insn_per_cycle:-0},${branch_misses:-0},${gpu_teams:-0},${gpu_threads_per_team:-0},${cuda_threads:-0},${ket:-0},${saxpy:-0}"
 
             # Reset
             time_elapsed=""
