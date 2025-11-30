@@ -4,7 +4,7 @@
 echo "dataset,n,tsteps,cpu_threads,seconds_time_elapsed,insn_per_cycle,branch_misses,gpu_teams,gpu_threads_per_team"
 
 # OMP 
-cd OpenMP
+cd OpenMP/versions
   cd jacobi-1d-imper_vanilla
   ./plotter.sh
   cd ..
@@ -16,11 +16,11 @@ cd OpenMP
   cd jacobi-1d-imper_GPU
   ./plotter.sh
   cd ..
-cd ..
+cd ../..
 
 echo "dataset,n,tsteps,cpu_threads,block_size,seconds_time_elapsed,insn_per_cycle,branch_misses,gpu_teams,gpu_threads_per_team,ket,saxpy"
 # CUDA
-cd CUDA
+cd CUDA/versions
 
   cd jacobi-1d-imper_es
   ./plotter.sh
@@ -30,4 +30,4 @@ cd CUDA
   ./plotter.sh
   cd ..
   
-cd ..
+cd ../..
