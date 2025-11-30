@@ -59,11 +59,12 @@ __global__ void jacobi_1d_kernel(DATA_TYPE *A, DATA_TYPE *B, int n )
   int i = blockIdx.x * blockDim.x + threadIdx.x; 
 
     if (i > 0 && i < n - 1) 
-    {
-        B[i] = 0.33333 * (A[i - 1] + A[i] + A[i + 1]);
+    {   
+        DATA_TYPE tmp = A[i - 1] + A[i] + A[i + 1];
+        __syncthreads();
+        B[i] = 0.33333 * tmp;
     }
   
-  //__syncthreads();
   
 }
 

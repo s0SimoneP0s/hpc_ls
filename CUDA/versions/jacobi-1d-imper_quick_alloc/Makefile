@@ -52,7 +52,7 @@ $(BUILD_DIR)/elapsed.c.o: $(TIME_UTIL_DIR)/elapsed.c
 	$(MKDIR_P) $(dir $@)
 	$(NVCC) -x cu $(NVCCFLAGS) -c $< -o $@
 
-.PHONY: all clean run test_mini test_small test_standard test_large test_extralarge
+.PHONY: all clean run test_mini_CU_qa test_small_CU_qa test_standard_CU_qa test_large_CU_qa test_extralarge_CU_qa
 
 all: $(EXECUTABLE)
 
@@ -68,7 +68,7 @@ profile: $(EXECUTABLE)
 	chmod +x $<
 	$(CUDA_HOME)/bin/nvprof ./$(EXECUTABLE)
 
-test_mini test_small test_standard test_large test_extralarge: $(EXECUTABLE)
+test_mini_CU_qa test_small_CU_qa test_standard_CU_qa test_large_CU_qa test_extralarge_CU_qa: $(EXECUTABLE)
 	@echo "==================================================="
 	@echo "Esecuzione $(patsubst test_%,%,$@)_DATASET"
 	chmod +x $<

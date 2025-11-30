@@ -64,7 +64,7 @@ __global__ void jacobi_1d_kernel(DATA_TYPE *A, DATA_TYPE *B, int n )
   
   // -1 halo
   if (tx == 0 && blockIdx.x > 0) {
-    B[0] = A[global_i - 1];
+    B[tx] = A[global_i - 1];
   }
   
   // +1 halo
