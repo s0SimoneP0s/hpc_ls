@@ -1,4 +1,4 @@
-dataset,n,tsteps,cpu_threads,block_size,seconds_time_elapsed,insn_per_cycle,branch_misses,gpu_teams,gpu_threads_per_team,ket,saxpy
+dataset,n,tsteps,cpu_threads,block_size,seconds_time_elapsed,insn_per_cycle,branch_misses,gpu_teams,gpu_threads_per_team,cuda_threads,ket,saxpy
 test_mini,500,2,1,nan,0,005291787,0.52,15617,nan,nan,nan,0.012,0.005
 test_small,1000,10,1,nan,0,007632155,0.58,16352,nan,nan,nan,0.013,0.007
 test_standard,10000,100,1,nan,0,010328794,1.76,17303,nan,nan,nan,0.052,0.032
