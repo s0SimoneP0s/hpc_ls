@@ -2,6 +2,7 @@ ifndef CUDA_HOME
 CUDA_HOME := /usr/local/cuda
 endif
 
+TIME_UTIL_DIR = ../../elapsed_utils
 UTIL_DIR = ../../utilities
 BUILD_DIR ?= ./build
 MKDIR_P ?= mkdir -p
@@ -11,14 +12,14 @@ NVCC := $(CUDA_HOME)/bin/nvcc
 
 BENCHMARK := jacobi-1d-imper.cu
 EXECUTABLE := $(BENCHMARK:.cu=_cuda)
-OBJ_FILES := $(BUILD_DIR)/$(BENCHMARK:.cu=.cu.o) $(BUILD_DIR)/polybench.c.o
+OBJ_FILES := $(BUILD_DIR)/$(BENCHMARK:.cu=.cu.o) $(BUILD_DIR)/polybench.c.o $(BUILD_DIR)/elapsed.c.o
 
 DATASET ?= -DSTANDARD_DATASET
 $(foreach size,mini small standard large extralarge,\
   $(if $(filter test_$(size),$(MAKECMDGOALS)),$(eval DATASET=-D$(shell echo $(size) | tr a-z A-Z)_DATASET)))
 
 # C flags
-CCFLAGS := -O2 -g -I. -I$(UTIL_DIR) $(EXT_CCFLAGS)
+CCFLAGS := -O2 -g -I. -I$(UTIL_DIR) -I$(TIME_UTIL_DIR) $(EXT_CCFLAGS)
 NVCCFLAGS := -Xcompiler -fopenmp -lineinfo --ptxas-options=-v --use_fast_math \
 	-arch=sm_53 $(CCFLAGS)
 
@@ -37,15 +38,19 @@ $(BUILD_DIR)/%.cu.o: %.cu
 
 $(BUILD_DIR)/%.cpp.o: %.cpp
 	$(MKDIR_P) $(dir $@)
-	$(CC) $(CCFLAGS) -c $< -o $@
+	$(NVCC) -x cu $(NVCCFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/%.c.o: %.c
 	$(MKDIR_P) $(dir $@)
-	$(CC) $(CCFLAGS) -c $< -o $@
+	$(NVCC) -x cu $(NVCCFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/polybench.c.o: $(UTIL_DIR)/polybench.c
 	$(MKDIR_P) $(dir $@)
-	$(NVCC) -x cu $(CCFLAGS) -c $< -o $@
+	$(NVCC) -x cu $(NVCCFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/elapsed.c.o: $(TIME_UTIL_DIR)/elapsed.c
+	$(MKDIR_P) $(dir $@)
+	$(NVCC) -x cu $(NVCCFLAGS) -c $< -o $@
 
 .PHONY: all clean run test_mini_CU_es test_small_CU_es test_standard_CU_es test_large_CU_es test_extralarge_CU_es
 

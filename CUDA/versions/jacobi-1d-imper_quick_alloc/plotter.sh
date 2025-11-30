@@ -45,7 +45,7 @@ for i in "${test_size_list[@]}"; do
         fi
 
 
-        # Kernel execution time
+        # Kernel execution time (only last run)
         if [[ "$line" =~ ^Kernel\ execution\ time:\ ([0-9.]+) ]]; then
             ket="${BASH_REMATCH[1]}"
         fi
@@ -66,8 +66,9 @@ for i in "${test_size_list[@]}"; do
         if [[ "$line" =~ ^[[:space:]]+([0-9]+[,.]?[0-9]+).*seconds\ time\ elapsed ]]; then
             time_elapsed=$(format_number "${BASH_REMATCH[1]}")
 
+
             # print csv
-            echo "${i},${n},${tsteps},${threads:-0},${b_size:-0},${time_elapsed:-0},${insn_per_cycle:-0},${branch_misses:-0},${gpu_teams:-0},${gpu_threads_per_team:-0},${ket:-0}"
+            echo "${i},${n},${tsteps},${threads:-0},${b_size:-0},${time_elapsed:-0},${insn_per_cycle:-0},${branch_misses:-0},${gpu_teams:-0},${gpu_threads_per_team:-0}"
 
             # Reset
             time_elapsed=""

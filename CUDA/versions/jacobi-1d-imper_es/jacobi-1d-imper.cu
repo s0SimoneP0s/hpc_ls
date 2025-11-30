@@ -121,7 +121,10 @@ int main(int argc, char **argv)
 
 
   /* Run kernel. */
+  start_timer();
   kernel_jacobi_1d_imper(tsteps, n, POLYBENCH_ARRAY(A), POLYBENCH_ARRAY(B));
+  stop_timer();
+  print_elapsed_ms("Kernel execution time");
 
   /* Be clean.  UVM for cuda*/
   POLYBENCH_FREE_ARRAY(A);
