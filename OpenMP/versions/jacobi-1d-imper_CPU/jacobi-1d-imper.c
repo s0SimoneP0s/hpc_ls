@@ -58,9 +58,13 @@ static void kernel_jacobi_1d_imper(int tsteps,
 
     for (t = 0; t < _PB_TSTEPS; t++)
     {
+      start_timer();
       #pragma omp parallel private(i) 
       for (i = 1; i < _PB_N - 1; i++)
         B[i] = 0.33333 * (A[i - 1] + A[i] + A[i + 1]);
+      stop_timer();
+      print_elapsed_ms("SAXPY execution time");
+
       #pragma omp parallel private(j) 
       for (j = 1; j < _PB_N - 1; j++) 
         A[j] = B[j];
@@ -83,7 +87,10 @@ int main(int argc, char **argv)
 
 
   /* Run kernel. */
+  start_timer();
   kernel_jacobi_1d_imper(tsteps, n, POLYBENCH_ARRAY(A), POLYBENCH_ARRAY(B));
+  stop_timer();
+  print_elapsed_ms("Kernel execution time");
 
 
   /* Prevent dead-code elimination. All live-out data must be printed

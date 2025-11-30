@@ -54,8 +54,11 @@ static void kernel_jacobi_1d_imper(int tsteps,
 
   for (t = 0; t < _PB_TSTEPS; t++)
   {
+    start_timer();
     for (i = 1; i < _PB_N - 1; i++)
       B[i] = 0.33333 * (A[i - 1] + A[i] + A[i + 1]);
+    stop_timer();
+    print_elapsed_ms("SAXPY execution time");
 
     for (j = 1; j < _PB_N - 1; j++)
       A[j] = B[j];
@@ -80,15 +83,11 @@ int main(int argc, char **argv)
   /* Initialize array(s). */
   init_array(n, POLYBENCH_ARRAY(A), POLYBENCH_ARRAY(B));
 
-  /* Start timer. */
-  polybench_start_instruments;
-
   /* Run kernel. */
+  start_timer();
   kernel_jacobi_1d_imper(tsteps, n, POLYBENCH_ARRAY(A), POLYBENCH_ARRAY(B));
-
-  /* Stop and print timer. */
-  polybench_stop_instruments;
-  polybench_print_instruments;
+  stop_timer();
+  print_elapsed_ms("Kernel execution time");
 
   /* Prevent dead-code elimination. All live-out data must be printed
      by the function call in argument. */
