@@ -2,15 +2,13 @@
 # Script perf to CSV
 # Uso: ./parse_perf.sh > output.csv
 
-format_number() {
-    local num="$1"
-    num="${num//./}"       
-    num="${num//,/.}"      
-    echo "$num"
-}
+source ../../../utils/plotter_utils.sh
+
 
 declare -a test_size_list=("test_mini_G" "test_small_G" "test_standard_G" "test_large_G" "test_extralarge_G")
 
+touch jacobi-1d-imper_omp
+rm jacobi-1d-imper_omp || true
 
 for i in "${test_size_list[@]}"; do
 
@@ -25,52 +23,8 @@ for i in "${test_size_list[@]}"; do
         *) n=0; tsteps=0 ;;
     esac
 
-    threads=""
-    time_elapsed=""
-    insn_per_cycle=""
-    branch_misses=""
+    process_input "input_${i}.txt" "$i" "$n" "$tsteps"
 
-    while IFS= read -r line; do
-        # threads
-        if [[ "$line" =~ ^===\ Test\ con\ ([0-9]+)\ thread ]]; then
-            threads="${BASH_REMATCH[1]}"
-        fi
-
-        # gpu_teams
-        if [[ "$line" =~ ^Teams:[[:space:]]+([0-9]+) ]]; then
-            gpu_teams="${BASH_REMATCH[1]}"
-        fi
-
-        # gpu_threads_per_team
-        if [[ "$line" =~ ^Thread\ limit:[[:space:]]+([0-9]+) ]]; then
-            gpu_threads_per_team="${BASH_REMATCH[1]}"
-        fi
-
-        # insn per cycle
-        if [[ "$line" =~ instructions.*#[[:space:]]+([0-9]+)[,.]([0-9]+)[[:space:]]+insn\ per\ cycle ]]; then
-            insn_per_cycle="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}"
-        elif [[ "$line" =~ instructions.*#[[:space:]]+([0-9]+)[[:space:]]+insn\ per\ cycle ]]; then
-            insn_per_cycle="${BASH_REMATCH[1]}"
-        fi
-
-        # branch misses
-        if [[ "$line" =~ ^[[:space:]]+([0-9]+)[.,]?([0-9]*)[[:space:]]+branch-misses ]]; then
-            branch_misses="${BASH_REMATCH[1]}${BASH_REMATCH[2]}"
-        fi
-
-        # seconds time elapsed
-        if [[ "$line" =~ ^[[:space:]]+([0-9]+[,.]?[0-9]+)[[:space:]]+seconds\ time\ elapsed ]]; then
-            time_elapsed=$(format_number "${BASH_REMATCH[1]}")
-
-            # Stampa riga CSV
-            echo "${i},${n},${tsteps},${threads:-0},${time_elapsed:-0},${insn_per_cycle:-0},${branch_misses:-0},${gpu_teams:-0},${gpu_threads_per_team:-0}"
-
-            # Reset
-            time_elapsed=""
-            insn_per_cycle=""
-            branch_misses=""
-        fi
-    done < "input_${i}.txt"
     rm jacobi-1d-imper_omp
 done
 rm input_*.txt

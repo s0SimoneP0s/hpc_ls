@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "dataset,n,tsteps,cpu_threads,seconds_time_elapsed,insn_per_cycle,branch_misses,gpu_teams,gpu_threads_per_team"
+echo "dataset,n,tsteps,cpu_threads,block_size,seconds_time_elapsed,insn_per_cycle,branch_misses,gpu_teams,gpu_threads_per_team,ket,saxpy"
 
 # OMP 
 cd OpenMP/versions
@@ -17,7 +17,7 @@ cd OpenMP/versions
   cd ..
 cd ../..
 
-echo "dataset,n,tsteps,cpu_threads,block_size,seconds_time_elapsed,insn_per_cycle,branch_misses,gpu_teams,gpu_threads_per_team,ket,saxpy"
+
 # CUDA
 cd CUDA/versions
 

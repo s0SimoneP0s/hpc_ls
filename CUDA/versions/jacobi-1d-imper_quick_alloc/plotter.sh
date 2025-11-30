@@ -4,16 +4,10 @@
 
 source ../../../utils/plotter_utils.sh
 
-format_number() {
-    local num="$1"
-    num="${num//,/\.}" # pointed decimal
-    num="$(echo -n "$num" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')" # skipwtsp
-    echo "$num"
-}
-
-
 declare -a test_size_list=("test_mini_CU_qa" "test_small_CU_qa" "test_standard_CU_qa" "test_large_CU_qa" "test_extralarge_CU_qa")
 
+touch jacobi-1d-imper_cuda
+rm jacobi-1d-imper_cuda build/*.o || true
 
 for i in "${test_size_list[@]}"; do
 

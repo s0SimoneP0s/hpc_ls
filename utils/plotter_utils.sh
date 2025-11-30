@@ -1,6 +1,12 @@
 #!/bin/bash
 
-# Function to process input and extract metrics
+format_number() {
+    local num="$1"
+    num="$(echo -n "$num" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')" # skipwtsp
+    echo "$num"
+}
+
+
 process_input() {
     local input_file="$1"
     local i="$2"
