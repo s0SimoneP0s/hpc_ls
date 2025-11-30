@@ -14,9 +14,11 @@ BENCHMARK := jacobi-1d-imper.cu
 EXECUTABLE := $(BENCHMARK:.cu=_cuda)
 OBJ_FILES := $(BUILD_DIR)/$(BENCHMARK:.cu=.cu.o) $(BUILD_DIR)/polybench.c.o $(BUILD_DIR)/elapsed.c.o
 
-DATASET ?= -DSTANDARD_DATASET
+
 $(foreach size,mini_CU_es small_CU_es standard_CU_es large_CU_es extrala_CU_es,\
   $(if $(filter test_$(size),$(MAKECMDGOALS)),$(eval DATASET=-D$(shell echo $(size) | tr a-z A-Z)_DATASET)))
+
+$(info Dataset : $(DATASET))
 
 TIMING = -DPOLYBENCH_TIME
 

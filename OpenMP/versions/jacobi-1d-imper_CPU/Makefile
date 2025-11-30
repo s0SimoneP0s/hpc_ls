@@ -8,15 +8,15 @@ MKDIR_P ?= mkdir -p
 CC = gcc
 
 
-# File sorgente
 BENCHMARK := jacobi-1d-imper.c
 EXECUTABLE := $(BENCHMARK:.c=_omp)
 OBJ_FILES := $(BUILD_DIR)/$(BENCHMARK:.c=.c.o) $(BUILD_DIR)/polybench.c.o $(BUILD_DIR)/elapsed.c.o
 
 
-DATASET ?= -DSTANDARD_DATASET
 $(foreach size,mini_C small_C standard_C large_C extralarge_C,\
   $(if $(filter test_$(size),$(MAKECMDGOALS)),$(eval DATASET=-D$(shell echo $(size) | tr a-z A-Z)_DATASET)))
+
+$(info Dataset : $(DATASET))
 
 TIMING = -DPOLYBENCH_TIME
 
@@ -64,7 +64,7 @@ run: $(EXECUTABLE)
 
 test_mini_C test_small_C test_standard_C test_large_C test_extralarge_C: $(EXECUTABLE)
 	@echo ===================================================
-	@echo "Esecuzione MINI_DATASET "
+	@echo "Esecuzione $(patsubst %,%,$@)"
 	@echo "=== Test con 1 thread ==="
 	OMP_NUM_THREADS=1 perf stat -r 10 ./$(EXECUTABLE)
 	@echo "\n=== Test con 2 thread ==="

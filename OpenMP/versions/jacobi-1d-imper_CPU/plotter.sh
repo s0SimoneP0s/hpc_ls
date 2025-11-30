@@ -11,6 +11,7 @@ rm jacobi-1d-imper_omp || true
 
 for i in "${test_size_list[@]}"; do
 
+    make clean > /dev/null 2>&1
     make "$i" > "input_${i}.txt" 2>&1
 
     case "$i" in

@@ -4,8 +4,6 @@
 
 source ../../../utils/plotter_utils.sh
 
-
-
 declare -a test_size_list=("test_mini" "test_small" "test_standard" "test_large" "test_extralarge")
 
 touch jacobi-1d-imper_omp
@@ -13,6 +11,7 @@ rm jacobi-1d-imper_omp || true
 
 for i in "${test_size_list[@]}"; do
 
+    make clean > /dev/null 2>&1
     make "$i" > "input_${i}.txt" 2>&1
 
     case "$i" in
