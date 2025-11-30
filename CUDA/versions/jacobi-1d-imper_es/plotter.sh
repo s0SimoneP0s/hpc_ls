@@ -34,6 +34,18 @@ for i in "${test_size_list[@]}"; do
 
     while IFS= read -r line; do
 
+
+        # gpu_teams
+        if [[ "$line" =~ ^Teams:[[:space:]]+([0-9]+) ]]; then
+            gpu_teams="${BASH_REMATCH[1]}"
+        fi
+
+        # gpu_threads_per_team
+        if [[ "$line" =~ ^Thread\ limit:[[:space:]]+([0-9]+) ]]; then
+            gpu_threads_per_team="${BASH_REMATCH[1]}"
+        fi
+
+
         # threads
         if [[ "$line" =~ ^Threads:\ ([0-9]+) ]]; then
             threads="${BASH_REMATCH[1]}"

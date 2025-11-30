@@ -34,6 +34,18 @@ for i in "${test_size_list[@]}"; do
 
     while IFS= read -r line; do
 
+
+        # gpu_teams
+        if [[ "$line" =~ ^Teams:[[:space:]]+([0-9]+) ]]; then
+            gpu_teams="${BASH_REMATCH[1]}"
+        fi
+
+        # gpu_threads_per_team
+        if [[ "$line" =~ ^Thread\ limit:[[:space:]]+([0-9]+) ]]; then
+            gpu_threads_per_team="${BASH_REMATCH[1]}"
+        fi
+
+
         # threads
         if [[ "$line" =~ ^Threads:\ ([0-9]+) ]]; then
             threads="${BASH_REMATCH[1]}"
@@ -44,10 +56,14 @@ for i in "${test_size_list[@]}"; do
             b_size="${BASH_REMATCH[1]}"
         fi
 
-
         # Kernel execution time (only last run)
         if [[ "$line" =~ ^Kernel\ execution\ time:\ ([0-9.]+) ]]; then
             ket="${BASH_REMATCH[1]}"
+        fi
+
+        # SAXPY execution time (only last run)
+        if [[ "$line" =~ ^SAXPY\ execution\ time:\ ([0-9.]+) ]]; then
+            saxpy="${BASH_REMATCH[1]}"
         fi
 
         # insn per cycle
@@ -62,10 +78,10 @@ for i in "${test_size_list[@]}"; do
             branch_misses="${BASH_REMATCH[1]}${BASH_REMATCH[2]}"
         fi
 
+
         # seconds time elapsed
         if [[ "$line" =~ ^[[:space:]]+([0-9]+[,.]?[0-9]+).*seconds\ time\ elapsed ]]; then
             time_elapsed=$(format_number "${BASH_REMATCH[1]}")
-
 
             # print csv
             echo "${i},${n},${tsteps},${threads:-0},${b_size:-0},${time_elapsed:-0},${insn_per_cycle:-0},${branch_misses:-0},${gpu_teams:-0},${gpu_threads_per_team:-0},${ket:-0},${saxpy:-0}"
