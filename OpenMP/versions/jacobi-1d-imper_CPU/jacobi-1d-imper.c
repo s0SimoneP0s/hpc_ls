@@ -5,12 +5,14 @@
 
 /* Include polybench common header. */
 #include <polybench.h>
+#include <elapsed.h>
 
 /* Include benchmark-specific header. */
 /* Default data type is double, default size is 100x10000. */
 #include "jacobi-1d-imper.h"
 
 int omp_get_num_threads(void);
+
 
 /* Array initialization. */
 static void init_array(int n,

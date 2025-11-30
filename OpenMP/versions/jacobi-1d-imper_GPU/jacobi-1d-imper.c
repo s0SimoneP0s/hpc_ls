@@ -5,6 +5,7 @@
 
 /* Include polybench common header. */
 #include <polybench.h>
+#include <elapsed.h>
 
 /* Include benchmark-specific header. */
 /* Default data type is double, default size is 100x10000. */

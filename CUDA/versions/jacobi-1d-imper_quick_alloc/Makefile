@@ -15,8 +15,10 @@ EXECUTABLE := $(BENCHMARK:.cu=_cuda)
 OBJ_FILES := $(BUILD_DIR)/$(BENCHMARK:.cu=.cu.o) $(BUILD_DIR)/polybench.c.o $(BUILD_DIR)/elapsed.c.o
 
 DATASET ?= -DSTANDARD_DATASET
-$(foreach size,mini small standard large extralarge,\
+$(foreach size,mini_CU_qa small_CU_qa standard_CU_qa large_CU_qa extrala_CU_qa,\
   $(if $(filter test_$(size),$(MAKECMDGOALS)),$(eval DATASET=-D$(shell echo $(size) | tr a-z A-Z)_DATASET)))
+
+TIMING = -DPOLYBENCH_TIME
 
 # C flags
 CCFLAGS := -O2 -g -I. -I$(UTIL_DIR) -I$(TIME_UTIL_DIR) $(EXT_CCFLAGS)
@@ -70,7 +72,7 @@ profile: $(EXECUTABLE)
 
 test_mini_CU_qa test_small_CU_qa test_standard_CU_qa test_large_CU_qa test_extralarge_CU_qa: $(EXECUTABLE)
 	@echo "==================================================="
-	@echo "Esecuzione $(patsubst test_%,%,$@)_DATASET"
+	@echo "Esecuzione $(patsubst %,%,$@)"
 	chmod +x $<
 	NUM_THREADS=128 BLOCK_SIZE=32  perf stat -r 5 ./$<
 	NUM_THREADS=128 BLOCK_SIZE=128 perf stat -r 5 ./$<
@@ -89,5 +91,5 @@ test_mini_CU_qa test_small_CU_qa test_standard_CU_qa test_large_CU_qa test_extra
 optimized: NVCCFLAGS += -O3 -ffast-math
 optimized: $(EXECUTABLE)
 
-debug: NVCCFLAGS = -g -O0 -I. -I$(UTIL_DIR) $(DATASET) -DPOLYBENCH_TIME
+debug: NVCCFLAGS = -g -O0 -I. -I$(UTIL_DIR) $(DATASET) $(TIMING)
 debug: $(EXECUTABLE)
