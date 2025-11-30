@@ -22,7 +22,7 @@ $(info Dataset : $(DATASET))
 TIMING = -DPOLYBENCH_TIME
 
 # C flags
-CCFLAGS = -O3 -fopenmp -march=native -I$(UTIL_DIR) -I$(TIME_UTIL_DIR) $(DATASET) 
+CCFLAGS = -O2 -fopenmp -march=native -I$(UTIL_DIR) -I$(TIME_UTIL_DIR) $(DATASET) 
 
 # linker flags
 CLFLAGS = -lm -fopenmp 

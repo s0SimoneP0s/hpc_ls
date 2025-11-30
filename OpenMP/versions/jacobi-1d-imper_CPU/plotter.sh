@@ -6,8 +6,7 @@ source ../../../utils/plotter_utils.sh
 
 declare -a test_size_list=("test_mini_C" "test_small_C" "test_standard_C" "test_large_C" "test_extralarge_C")
 
-touch jacobi-1d-imper_omp
-rm jacobi-1d-imper_omp || true
+
 
 for i in "${test_size_list[@]}"; do
 
@@ -25,6 +24,6 @@ for i in "${test_size_list[@]}"; do
 
     process_input "input_${i}.txt" "$i" "$n" "$tsteps"
 
-    rm jacobi-1d-imper_omp
+
 done
 rm input_*.txt
