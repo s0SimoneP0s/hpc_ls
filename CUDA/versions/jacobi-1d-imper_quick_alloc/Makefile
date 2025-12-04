@@ -1,5 +1,5 @@
 ifndef CUDA_HOME
-CUDA_HOME := /usr/local/cuda
+CUDA_HOME:= /usr/local/cuda
 endif
 
 TIME_UTIL_DIR = ../../../utils
@@ -76,18 +76,18 @@ test_mini_CU_qa test_small_CU_qa test_standard_CU_qa test_large_CU_qa test_extra
 	@echo "==================================================="
 	@echo "Esecuzione $(patsubst %,%,$@)"
 	chmod +x $<
-	NUM_THREADS=128 BLOCK_SIZE=32  perf stat -r 5 ./$<
-	NUM_THREADS=128 BLOCK_SIZE=128 perf stat -r 5 ./$<
-	NUM_THREADS=128 BLOCK_SIZE=256 perf stat -r 5 ./$<
-	NUM_THREADS=128 BLOCK_SIZE=512 perf stat -r 5 ./$<
-	NUM_THREADS=256 BLOCK_SIZE=32  perf stat -r 5 ./$<
-	NUM_THREADS=256 BLOCK_SIZE=128 perf stat -r 5 ./$<
-	NUM_THREADS=256 BLOCK_SIZE=256 perf stat -r 5 ./$<
-	NUM_THREADS=256 BLOCK_SIZE=512 perf stat -r 5 ./$<
-	NUM_THREADS=512 BLOCK_SIZE=32  perf stat -r 5 ./$<
-	NUM_THREADS=512 BLOCK_SIZE=128 perf stat -r 5 ./$<
-	NUM_THREADS=512 BLOCK_SIZE=256 perf stat -r 5 ./$<
-	NUM_THREADS=512 BLOCK_SIZE=512 perf stat -r 5 ./$<
+	NUM_THREADS=128 BLOCK_SIZE=32  perf stat -r 1 ./$<
+	NUM_THREADS=128 BLOCK_SIZE=128 perf stat -r 1 ./$<
+	NUM_THREADS=128 BLOCK_SIZE=256 perf stat -r 1 ./$<
+	NUM_THREADS=128 BLOCK_SIZE=512 perf stat -r 1 ./$<
+	NUM_THREADS=256 BLOCK_SIZE=32  perf stat -r 1 ./$<
+	NUM_THREADS=256 BLOCK_SIZE=128 perf stat -r 1 ./$<
+	NUM_THREADS=256 BLOCK_SIZE=256 perf stat -r 1 ./$<
+	NUM_THREADS=256 BLOCK_SIZE=512 perf stat -r 1 ./$<
+	NUM_THREADS=512 BLOCK_SIZE=32  perf stat -r 1 ./$<
+	NUM_THREADS=512 BLOCK_SIZE=128 perf stat -r 1 ./$<
+	NUM_THREADS=512 BLOCK_SIZE=256 perf stat -r 1 ./$<
+	NUM_THREADS=512 BLOCK_SIZE=512 perf stat -r 1 ./$<
 	@echo "...................................................."
 
 optimized: NVCCFLAGS += -O3 -ffast-math
