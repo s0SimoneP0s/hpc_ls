@@ -27,7 +27,7 @@
 #  endif
 
 #  ifdef EXTRALARGE_DATASET
-#   define TSTEPS 1000
+#   define TSTEPS 10000
 #   define N 1000000
 #  endif
 # endif 

@@ -57,7 +57,6 @@ __global__ void jacobi_1d_kernel(DATA_TYPE *A, DATA_TYPE *B, int n)
 {
   int i = blockIdx.x * blockDim.x + threadIdx.x;
   
-  // Aggiungi boundary check più robusto
   if (i > 0 && i < n - 1)
   {
     DATA_TYPE tmp = A[i - 1] + A[i] + A[i + 1];
@@ -75,8 +74,8 @@ __global__ void simple_test_kernel(DATA_TYPE *A, int n)
 }
 
 void kernel_jacobi_1d_imper(int tsteps, int n,
-                           DATA_TYPE POLYBENCH_1D(A, N, n),
-                           DATA_TYPE POLYBENCH_1D(B, N, n))
+                           DATA_TYPE *A,
+                           DATA_TYPE *B)
 {
   dim3 numThreads(BLOCK_SIZE);
   int numBlocks = (n + BLOCK_SIZE - 1) / BLOCK_SIZE;
@@ -90,72 +89,55 @@ void kernel_jacobi_1d_imper(int tsteps, int n,
   printf("  Total threads: %d\n", numBlocks * BLOCK_SIZE);
   printf("  Array size: %d elements (%.2f MB)\n", n, (n * sizeof(DATA_TYPE)) / (1024.0 * 1024.0));
   printf("  Iterations: %d\n", tsteps);
+  printf("  Sync strategy: ");
+  
+  // Strategia ottimizzata: sync solo ogni N iterazioni
+  int sync_interval = 10;
+  if (tsteps <= 10) sync_interval = 1;
+  else if (tsteps <= 100) sync_interval = 10;
+  else sync_interval = 50;
+  
+  printf("sync every %d iterations\n", sync_interval);
   printf("\n");
   
-  // Test preliminare: verifica che i puntatori siano validi
-  printf("Testing pointer validity...\n");
-  printf("  ptr_A = %p\n", (void*)ptr_A);
-  printf("  ptr_B = %p\n", (void*)ptr_B);
+  // Test semplice rimosso per velocità
+  printf("Starting Jacobi iterations...\n");
   
-  // Verifica con cudaPointerGetAttributes
-  cudaPointerAttributes attr_A, attr_B;
-  cudaError_t err_A = cudaPointerGetAttributes(&attr_A, ptr_A);
-  cudaError_t err_B = cudaPointerGetAttributes(&attr_B, ptr_B);
-  
-  if (err_A == cudaSuccess) {
-    printf("  A is managed memory: %d\n", attr_A.type == cudaMemoryTypeManaged);
-  } else {
-    printf("  WARNING: Cannot get attributes for A: %s\n", cudaGetErrorString(err_A));
-  }
-  
-  if (err_B == cudaSuccess) {
-    printf("  B is managed memory: %d\n", attr_B.type == cudaMemoryTypeManaged);
-  } else {
-    printf("  WARNING: Cannot get attributes for B: %s\n", cudaGetErrorString(err_B));
-  }
-  
-  printf("\nRunning simple test kernel first...\n");
-  simple_test_kernel<<<numBlocks, numThreads>>>(ptr_A, n);
-  CUDA_CHECK(cudaGetLastError());
-  CUDA_CHECK(cudaDeviceSynchronize());
-  printf("Simple test kernel completed successfully!\n");
-  printf("Sample value after test: A[100] = %.6f (should be ~0.0204)\n", ptr_A[100]);
-  
-  // Reinizializza A
-  printf("Reinitializing array...\n");
-  for (int i = 0; i < n; i++) {
-    ptr_A[i] = ((DATA_TYPE)i + 2) / n;
-  }
-  CUDA_CHECK(cudaDeviceSynchronize());
-  
-  printf("\nStarting Jacobi iterations...\n");
-  
+  int last_sync = 0;
   for (int t = 0; t < tsteps; t++) {
     jacobi_1d_kernel<<<numBlocks, numThreads>>>(ptr_A, ptr_B, n);
     
-    // Check per errori di lancio
+    // Check errori solo dopo il lancio (non blocca)
     cudaError_t launch_err = cudaGetLastError();
     if (launch_err != cudaSuccess) {
       printf("Kernel launch error at iteration %d: %s\n", t, cudaGetErrorString(launch_err));
+      cudaDeviceSynchronize();
       break;
-    }
-    
-    // Sincronizza
-    cudaError_t sync_err = cudaDeviceSynchronize();
-    if (sync_err != cudaSuccess) {
-      printf("Kernel execution error at iteration %d: %s\n", t, cudaGetErrorString(sync_err));
-      break;
-    }
-    
-    // Stampa progresso ogni 10 iterazioni
-    if (t % 10 == 0 && t > 0) {
-      printf("  Completed %d/%d iterations - Sample value: B[100] = %.6f\n", t, tsteps, ptr_B[100]);
     }
     
     // Swap
     DATA_TYPE *tmp = ptr_A;
     ptr_A = ptr_B;
     ptr_B = tmp;
+    
+    // Sincronizza solo periodicamente
+    if ((t + 1) % sync_interval == 0 || t == tsteps - 1) {
+      cudaError_t sync_err = cudaDeviceSynchronize();
+      if (sync_err != cudaSuccess) {
+        printf("Kernel execution error at iteration %d: %s\n", t, cudaGetErrorString(sync_err));
+        break;
+      }
+      
+      if ((t + 1) % 100 == 0) {
+        printf("  Completed %d/%d iterations\n", t + 1, tsteps);
+      }
+      last_sync = t + 1;
+    }
+  }
+  
+  // Sync finale se necessario
+  if (last_sync < tsteps) {
+    cudaDeviceSynchronize();
   }
   
   printf("All iterations completed!\n");
@@ -163,7 +145,6 @@ void kernel_jacobi_1d_imper(int tsteps, int n,
   // Copia il risultato finale in A se necessario
   if (tsteps % 2 == 1) {
     CUDA_CHECK(cudaMemcpy(A, ptr_A, n * sizeof(DATA_TYPE), cudaMemcpyDeviceToDevice));
-    CUDA_CHECK(cudaDeviceSynchronize());
   }
 }
 
@@ -197,11 +178,17 @@ int main(int argc, char **argv)
   printf("  n = %d\n", n);
   printf("  tsteps = %d\n", tsteps);
   printf("  BLOCK_SIZE = %d\n", BLOCK_SIZE);
+  printf("  Allocating %.2f MB per array\n", (n * sizeof(DATA_TYPE)) / (1024.0 * 1024.0));
   printf("\n");
 
-  POLYBENCH_1D_ARRAY_DECL(A, DATA_TYPE, N, n);
-  POLYBENCH_1D_ARRAY_DECL(B, DATA_TYPE, N, n);
-
+  // Alloca direttamente
+  DATA_TYPE *A = NULL;
+  DATA_TYPE *B = NULL;
+  
+  printf("Allocating memory with cudaMallocManaged...\n");
+  CUDA_CHECK(cudaMallocManaged(&A, n * sizeof(DATA_TYPE)));
+  CUDA_CHECK(cudaMallocManaged(&B, n * sizeof(DATA_TYPE)));
+  
   if (A == NULL || B == NULL) {
     printf("ERROR: Memory allocation failed!\n");
     return 1;
@@ -212,22 +199,56 @@ int main(int argc, char **argv)
   printf("  B = %p\n\n", (void*)B);
   
   printf("Initializing arrays...\n");
-  init_array(n, POLYBENCH_ARRAY(A), POLYBENCH_ARRAY(B));
+  init_array(n, A, B);
   printf("Initial values: A[100] = %.6f, B[100] = %.6f\n\n", A[100], B[100]);
   
-  // Prefetch per UVM
-  printf("Prefetching to GPU...\n");
-  CUDA_CHECK(cudaMemPrefetchAsync(A, n * sizeof(DATA_TYPE), 0));
-  CUDA_CHECK(cudaMemPrefetchAsync(B, n * sizeof(DATA_TYPE), 0));
-  CUDA_CHECK(cudaDeviceSynchronize());
-  printf("Prefetch complete\n\n");
+  // Verifica che la memoria sia UVM
+  cudaPointerAttributes attr;
+  cudaError_t err = cudaPointerGetAttributes(&attr, A);
+  if (err == cudaSuccess) {
+    printf("Memory type: ");
+    if (attr.type == cudaMemoryTypeManaged) {
+      printf("Managed (UVM) ✓\n");
+      
+      // Prova prefetch solo se è UVM
+      printf("Prefetching to GPU...\n");
+      int device;
+      CUDA_CHECK(cudaGetDevice(&device));
+      printf("Using device: %d\n", device);
+      
+      err = cudaMemPrefetchAsync(A, n * sizeof(DATA_TYPE), device);
+      if (err != cudaSuccess) {
+        printf("WARNING: Prefetch failed for A: %s (continuing anyway)\n", cudaGetErrorString(err));
+        cudaGetLastError(); // Clear error
+      }
+      
+      err = cudaMemPrefetchAsync(B, n * sizeof(DATA_TYPE), device);
+      if (err != cudaSuccess) {
+        printf("WARNING: Prefetch failed for B: %s (continuing anyway)\n", cudaGetErrorString(err));
+        cudaGetLastError(); // Clear error
+      }
+      
+      CUDA_CHECK(cudaDeviceSynchronize());
+      printf("Prefetch complete\n");
+    } else if (attr.type == cudaMemoryTypeDevice) {
+      printf("Device only (not UVM)\n");
+    } else if (attr.type == cudaMemoryTypeHost) {
+      printf("Host only (not UVM)\n");
+    } else {
+      printf("Unregistered\n");
+    }
+  } else {
+    printf("WARNING: Cannot determine memory type: %s\n", cudaGetErrorString(err));
+    cudaGetLastError(); // Clear error
+  }
+  printf("\n");
   
   printf("========================================\n");
   printf("EXECUTING KERNEL\n");
   printf("========================================\n");
   
   start_timer();
-  kernel_jacobi_1d_imper(tsteps, n, POLYBENCH_ARRAY(A), POLYBENCH_ARRAY(B));
+  kernel_jacobi_1d_imper(tsteps, n, A, B);
   CUDA_CHECK(cudaDeviceSynchronize());
   stop_timer();
   
