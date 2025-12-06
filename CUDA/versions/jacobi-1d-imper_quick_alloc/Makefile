@@ -14,18 +14,30 @@ BENCHMARK := jacobi-1d-imper.cu
 EXECUTABLE := $(BENCHMARK:.cu=_cuda)
 OBJ_FILES := $(BUILD_DIR)/$(BENCHMARK:.cu=.cu.o) $(BUILD_DIR)/polybench.c.o $(BUILD_DIR)/elapsed.c.o
 
+# Determina il dataset in base al target
+ifeq ($(MAKECMDGOALS),test_mini_CU_qa)
+    DATASET := -DMINI_DATASET
+else ifeq ($(MAKECMDGOALS),test_small_CU_qa)
+    DATASET := -DSMALL_DATASET
+else ifeq ($(MAKECMDGOALS),test_standard_CU_qa)
+    DATASET := -DSTANDARD_DATASET
+else ifeq ($(MAKECMDGOALS),test_large_CU_qa)
+    DATASET := -DLARGE_DATASET
+else ifeq ($(MAKECMDGOALS),test_extralarge_CU_qa)
+    DATASET := -DEXTRALARGE_DATASET
+else
+    # Default se non specificato
+    DATASET := -DSTANDARD_DATASET
+endif
 
-$(foreach size,mini_CU_qa small_CU_qa standard_CU_qa large_CU_qa extrala_CU_qa,\
-  $(if $(filter test_$(size),$(MAKECMDGOALS)),$(eval DATASET=-D$(shell echo $(size) | tr a-z A-Z)_DATASET)))
-
-$(info Dataset : $(DATASET))
+$(info Dataset flag: $(DATASET))
 
 TIMING = -DPOLYBENCH_TIME
 
 # C flags
-CCFLAGS := -O2 -g -I. -I$(UTIL_DIR) -I$(TIME_UTIL_DIR) $(EXT_CCFLAGS)
+CCFLAGS := -O2 -g -I. -I$(UTIL_DIR) -I$(TIME_UTIL_DIR) $(DATASET) $(TIMING) $(EXT_CCFLAGS)
 NVCCFLAGS := -Xcompiler -fopenmp -lineinfo --ptxas-options=-v --use_fast_math \
-	-arch=sm_53 $(CCFLAGS)
+        -arch=sm_53 $(CCFLAGS)
 
 # linker flags
 CLFLAGS := -lm -lcudart $(EXT_CLFLAGS)
@@ -65,30 +77,238 @@ clean:
 
 run: $(EXECUTABLE)
 	@echo "Esecuzione del codice CUDA..."
-	chmod +x $<
-	perf stat -r 10 ./$<
+	chmod +x $
+	perf stat -r 10 ./$
 
 profile: $(EXECUTABLE)
-	chmod +x $<
+	chmod +x $
 	$(CUDA_HOME)/bin/nvprof ./$(EXECUTABLE)
 
-test_mini_CU_qa test_small_CU_qa test_standard_CU_qa test_large_CU_qa test_extralarge_CU_qa: $(EXECUTABLE)
+# Target di test - rebuild per ogni test per applicare il dataset corretto
+test_mini_CU_qa: clean
 	@echo "==================================================="
-	@echo "Esecuzione $(patsubst %,%,$@)"
-	chmod +x $<
-	NUM_THREADS=128 BLOCK_SIZE=32  perf stat -r 3 ./$<
-	NUM_THREADS=128 BLOCK_SIZE=128 perf stat -r 3 ./$<
-	NUM_THREADS=128 BLOCK_SIZE=256 perf stat -r 3 ./$<
-	NUM_THREADS=128 BLOCK_SIZE=512 perf stat -r 3 ./$<
-	NUM_THREADS=256 BLOCK_SIZE=32  perf stat -r 3 ./$<
-	NUM_THREADS=256 BLOCK_SIZE=128 perf stat -r 3 ./$<
-	NUM_THREADS=256 BLOCK_SIZE=256 perf stat -r 3 ./$<
-	NUM_THREADS=256 BLOCK_SIZE=512 perf stat -r 3 ./$<
-	NUM_THREADS=512 BLOCK_SIZE=32  perf stat -r 3 ./$<
-	NUM_THREADS=512 BLOCK_SIZE=128 perf stat -r 3 ./$<
-	NUM_THREADS=512 BLOCK_SIZE=256 perf stat -r 3 ./$<
-	NUM_THREADS=512 BLOCK_SIZE=512 perf stat -r 1 ./$<
-	@echo "...................................................."
+	@echo "Building and running MINI dataset"
+	@echo "==================================================="
+	$(MAKE) $(EXECUTABLE) DATASET=-DMINI_DATASET
+	chmod +x $(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=128 BLOCK_SIZE=32 ---"
+	NUM_THREADS=128 BLOCK_SIZE=32  perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=128 BLOCK_SIZE=128 ---"
+	NUM_THREADS=128 BLOCK_SIZE=128 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=128 BLOCK_SIZE=256 ---"
+	NUM_THREADS=128 BLOCK_SIZE=256 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=128 BLOCK_SIZE=512 ---"
+	NUM_THREADS=128 BLOCK_SIZE=512 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=256 BLOCK_SIZE=32 ---"
+	NUM_THREADS=256 BLOCK_SIZE=32  perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=256 BLOCK_SIZE=128 ---"
+	NUM_THREADS=256 BLOCK_SIZE=128 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=256 BLOCK_SIZE=256 ---"
+	NUM_THREADS=256 BLOCK_SIZE=256 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=256 BLOCK_SIZE=512 ---"
+	NUM_THREADS=256 BLOCK_SIZE=512 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=512 BLOCK_SIZE=32 ---"
+	NUM_THREADS=512 BLOCK_SIZE=32  perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=512 BLOCK_SIZE=128 ---"
+	NUM_THREADS=512 BLOCK_SIZE=128 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=512 BLOCK_SIZE=256 ---"
+	NUM_THREADS=512 BLOCK_SIZE=256 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=512 BLOCK_SIZE=512 ---"
+	NUM_THREADS=512 BLOCK_SIZE=512 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "==================================================="
+
+test_small_CU_qa: clean
+	@echo "==================================================="
+	@echo "Building and running SMALL dataset"
+	@echo "==================================================="
+	$(MAKE) $(EXECUTABLE) DATASET=-DSMALL_DATASET
+	chmod +x $(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=128 BLOCK_SIZE=32 ---"
+	NUM_THREADS=128 BLOCK_SIZE=32  perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=128 BLOCK_SIZE=128 ---"
+	NUM_THREADS=128 BLOCK_SIZE=128 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=128 BLOCK_SIZE=256 ---"
+	NUM_THREADS=128 BLOCK_SIZE=256 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=128 BLOCK_SIZE=512 ---"
+	NUM_THREADS=128 BLOCK_SIZE=512 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=256 BLOCK_SIZE=32 ---"
+	NUM_THREADS=256 BLOCK_SIZE=32  perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=256 BLOCK_SIZE=128 ---"
+	NUM_THREADS=256 BLOCK_SIZE=128 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=256 BLOCK_SIZE=256 ---"
+	NUM_THREADS=256 BLOCK_SIZE=256 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=256 BLOCK_SIZE=512 ---"
+	NUM_THREADS=256 BLOCK_SIZE=512 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=512 BLOCK_SIZE=32 ---"
+	NUM_THREADS=512 BLOCK_SIZE=32  perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=512 BLOCK_SIZE=128 ---"
+	NUM_THREADS=512 BLOCK_SIZE=128 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=512 BLOCK_SIZE=256 ---"
+	NUM_THREADS=512 BLOCK_SIZE=256 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=512 BLOCK_SIZE=512 ---"
+	NUM_THREADS=512 BLOCK_SIZE=512 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "==================================================="
+
+test_standard_CU_qa: clean
+	@echo "==================================================="
+	@echo "Building and running STANDARD dataset"
+	@echo "==================================================="
+	$(MAKE) $(EXECUTABLE) DATASET=-DSTANDARD_DATASET
+	chmod +x $(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=128 BLOCK_SIZE=32 ---"
+	NUM_THREADS=128 BLOCK_SIZE=32  perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=128 BLOCK_SIZE=128 ---"
+	NUM_THREADS=128 BLOCK_SIZE=128 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=128 BLOCK_SIZE=256 ---"
+	NUM_THREADS=128 BLOCK_SIZE=256 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=128 BLOCK_SIZE=512 ---"
+	NUM_THREADS=128 BLOCK_SIZE=512 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=256 BLOCK_SIZE=32 ---"
+	NUM_THREADS=256 BLOCK_SIZE=32  perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=256 BLOCK_SIZE=128 ---"
+	NUM_THREADS=256 BLOCK_SIZE=128 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=256 BLOCK_SIZE=256 ---"
+	NUM_THREADS=256 BLOCK_SIZE=256 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=256 BLOCK_SIZE=512 ---"
+	NUM_THREADS=256 BLOCK_SIZE=512 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=512 BLOCK_SIZE=32 ---"
+	NUM_THREADS=512 BLOCK_SIZE=32  perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=512 BLOCK_SIZE=128 ---"
+	NUM_THREADS=512 BLOCK_SIZE=128 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=512 BLOCK_SIZE=256 ---"
+	NUM_THREADS=512 BLOCK_SIZE=256 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=512 BLOCK_SIZE=512 ---"
+	NUM_THREADS=512 BLOCK_SIZE=512 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "==================================================="
+
+test_large_CU_qa: clean
+	@echo "==================================================="
+	@echo "Building and running LARGE dataset"
+	@echo "==================================================="
+	$(MAKE) $(EXECUTABLE) DATASET=-DLARGE_DATASET
+	chmod +x $(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=128 BLOCK_SIZE=32 ---"
+	NUM_THREADS=128 BLOCK_SIZE=32  perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=128 BLOCK_SIZE=128 ---"
+	NUM_THREADS=128 BLOCK_SIZE=128 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=128 BLOCK_SIZE=256 ---"
+	NUM_THREADS=128 BLOCK_SIZE=256 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=128 BLOCK_SIZE=512 ---"
+	NUM_THREADS=128 BLOCK_SIZE=512 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=256 BLOCK_SIZE=32 ---"
+	NUM_THREADS=256 BLOCK_SIZE=32  perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=256 BLOCK_SIZE=128 ---"
+	NUM_THREADS=256 BLOCK_SIZE=128 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=256 BLOCK_SIZE=256 ---"
+	NUM_THREADS=256 BLOCK_SIZE=256 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=256 BLOCK_SIZE=512 ---"
+	NUM_THREADS=256 BLOCK_SIZE=512 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=512 BLOCK_SIZE=32 ---"
+	NUM_THREADS=512 BLOCK_SIZE=32  perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=512 BLOCK_SIZE=128 ---"
+	NUM_THREADS=512 BLOCK_SIZE=128 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=512 BLOCK_SIZE=256 ---"
+	NUM_THREADS=512 BLOCK_SIZE=256 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=512 BLOCK_SIZE=512 ---"
+	NUM_THREADS=512 BLOCK_SIZE=512 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "==================================================="
+
+test_extralarge_CU_qa: clean
+	@echo "==================================================="
+	@echo "Building and running EXTRALARGE dataset"
+	@echo "==================================================="
+	$(MAKE) $(EXECUTABLE) DATASET=-DEXTRALARGE_DATASET
+	chmod +x $(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=128 BLOCK_SIZE=32 ---"
+	NUM_THREADS=128 BLOCK_SIZE=32  perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=128 BLOCK_SIZE=128 ---"
+	NUM_THREADS=128 BLOCK_SIZE=128 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=128 BLOCK_SIZE=256 ---"
+	NUM_THREADS=128 BLOCK_SIZE=256 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=128 BLOCK_SIZE=512 ---"
+	NUM_THREADS=128 BLOCK_SIZE=512 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=256 BLOCK_SIZE=32 ---"
+	NUM_THREADS=256 BLOCK_SIZE=32  perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=256 BLOCK_SIZE=128 ---"
+	NUM_THREADS=256 BLOCK_SIZE=128 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=256 BLOCK_SIZE=256 ---"
+	NUM_THREADS=256 BLOCK_SIZE=256 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=256 BLOCK_SIZE=512 ---"
+	NUM_THREADS=256 BLOCK_SIZE=512 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=512 BLOCK_SIZE=32 ---"
+	NUM_THREADS=512 BLOCK_SIZE=32  perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=512 BLOCK_SIZE=128 ---"
+	NUM_THREADS=512 BLOCK_SIZE=128 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=512 BLOCK_SIZE=256 ---"
+	NUM_THREADS=512 BLOCK_SIZE=256 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "--- NUM_THREADS=512 BLOCK_SIZE=512 ---"
+	NUM_THREADS=512 BLOCK_SIZE=512 perf stat -r 3 ./$(EXECUTABLE)
+	@echo ""
+	@echo "==================================================="
 
 optimized: NVCCFLAGS += -O3 -ffast-math
 optimized: $(EXECUTABLE)
