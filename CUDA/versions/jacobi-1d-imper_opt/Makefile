@@ -2,6 +2,7 @@ ifndef CUDA_HOME
 CUDA_HOME:= /usr/local/cuda
 endif
 
+LD_LIBRARY_PATH := /usr/local/cuda/lib64:$$LD_LIBRARY_PATH
 TIME_UTIL_DIR = ../../../utils
 UTIL_DIR = ../../utilities
 BUILD_DIR ?= ./build
@@ -71,25 +72,24 @@ run: $(EXECUTABLE)
 
 profile: $(EXECUTABLE)
 	chmod +x $
-	$(CUDA_HOME)/bin/nvprof ./$(EXECUTABLE)
+	LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(CUDA_HOME)/bin/nvprof --print-gpu-trace -o trace ./$(EXECUTABLE)
 
 
 test_mini_CU_opt test_small_CU_opt test_standard_CU_opt test_large_CU_opt test_extralarge_CU_opt: $(EXECUTABLE)
 	@echo "==================================================="
 	@echo "Esecuzione $(patsubst %,%,$@)"
 	chmod +x $<
-	NUM_THREADS=128 BLOCK_SIZE=32  perf stat -r 4 ./$<
-	NUM_THREADS=128 BLOCK_SIZE=128 perf stat -r 4 ./$<
-	NUM_THREADS=128 BLOCK_SIZE=256 perf stat -r 4 ./$<
-	NUM_THREADS=128 BLOCK_SIZE=512 perf stat -r 4 ./$<
-	NUM_THREADS=256 BLOCK_SIZE=32  perf stat -r 4 ./$<
-	NUM_THREADS=256 BLOCK_SIZE=128 perf stat -r 4 ./$<
-	NUM_THREADS=256 BLOCK_SIZE=256 perf stat -r 4 ./$<
-	NUM_THREADS=256 BLOCK_SIZE=512 perf stat -r 4 ./$<
-	NUM_THREADS=512 BLOCK_SIZE=32  perf stat -r 4 ./$<
-	NUM_THREADS=512 BLOCK_SIZE=128 perf stat -r 4 ./$<
-	NUM_THREADS=512 BLOCK_SIZE=256 perf stat -r 4 ./$<
-	NUM_THREADS=512 BLOCK_SIZE=512 perf stat -r 4 ./$<
+	NUM_THREADS=128 BLOCK_SIZE=32   perf stat -r 4 ./$<
+	NUM_THREADS=128 BLOCK_SIZE=256  perf stat -r 4 ./$<
+	NUM_THREADS=256 BLOCK_SIZE=32   perf stat -r 4 ./$<
+	NUM_THREADS=256 BLOCK_SIZE=256  perf stat -r 4 ./$<
+	NUM_THREADS=256 BLOCK_SIZE=512  perf stat -r 4 ./$<
+	NUM_THREADS=512 BLOCK_SIZE=32   perf stat -r 4 ./$<
+	NUM_THREADS=512 BLOCK_SIZE=256  perf stat -r 4 ./$<
+	NUM_THREADS=512 BLOCK_SIZE=512  perf stat -r 4 ./$<
+	NUM_THREADS=1024 BLOCK_SIZE=32  perf stat -r 4 ./$<
+	NUM_THREADS=1024 BLOCK_SIZE=256 perf stat -r 4 ./$<
+	NUM_THREADS=1024 BLOCK_SIZE=512 perf stat -r 4 ./$<
 	@echo "...................................................."
 
 
