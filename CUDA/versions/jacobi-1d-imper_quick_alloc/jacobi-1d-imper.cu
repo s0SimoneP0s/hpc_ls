@@ -65,7 +65,7 @@ void kernel_jacobi_1d_imper(int tsteps, int n,
                            DATA_TYPE *B)
 {
   dim3 numThreads(BLOCK_SIZE);
-  int numBlocks = NUM_THREADS / BLOCK_SIZE;
+  dim3 numBlocks(NUM_THREADS / BLOCK_SIZE); 
 
   for (int t = 0; t < tsteps; t++) {
 
