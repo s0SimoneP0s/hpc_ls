@@ -15,7 +15,7 @@
 
 #include "jacobi-1d-imper.h"
 
-#define HALO 1
+#define OVERLAP 1
 
 //int NUM_THREADS = atoi(getenv("NUM_THREADS"));
 //int BLOCK_SIZE = atoi(getenv("BLOCK_SIZE"));
@@ -60,18 +60,18 @@ __global__ void jacobi_1d_kernel(DATA_TYPE *A, DATA_TYPE *B, int n)
   
   // main data
   if (global_idx < n)
-    s_A[local_idx + HALO] = A[global_idx];
+    s_A[local_idx + OVERLAP] = A[global_idx];
   
   // left halo
-  if (local_idx < HALO) {
-    int gh = global_idx - HALO;
+  if (local_idx < OVERLAP) {
+    int gh = global_idx - OVERLAP;
     s_A[local_idx] = (gh >= 0) ? A[gh] : 0;
   }
 
   // right halo
-  if (local_idx >= BLOCK_SIZE - HALO) {
-    int gh = global_idx + HALO;
-    s_A[local_idx + 2*HALO] = (gh < n) ? A[gh] : 0;
+  if (local_idx >= BLOCK_SIZE - OVERLAP) {
+    int gh = global_idx + OVERLAP;
+    s_A[local_idx + 2*OVERLAP] = (gh < n) ? A[gh] : 0;
   }
   
   __syncthreads(); 
@@ -101,7 +101,7 @@ void kernel_jacobi_1d_imper(int tsteps, int n,
     if (t == tsteps/2)
       start_timer();
     //jacobi_1d_kernel<<<numBlocks, numThreads>>>(A, B, n);
-    size_t shmem = (BLOCK_SIZE + 2*HALO) * sizeof(DATA_TYPE); // shared memory size for each thread block to aggregate halo
+    size_t shmem = (BLOCK_SIZE + 2*OVERLAP) * sizeof(DATA_TYPE); // shared memory size for each thread block to aggregate halo
     jacobi_1d_kernel<<<numBlocks, numThreads, shmem>>>(A, B, n);
     if (t == tsteps/2)  { // took the middle iteration
       stop_timer(); 

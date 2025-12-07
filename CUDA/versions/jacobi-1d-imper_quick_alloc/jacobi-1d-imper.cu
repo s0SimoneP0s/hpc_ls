@@ -16,8 +16,16 @@
 #include "jacobi-1d-imper.h"
 
 
-int NUM_THREADS = atoi(getenv("NUM_THREADS"));
-int BLOCK_SIZE = atoi(getenv("BLOCK_SIZE"));
+//int NUM_THREADS = atoi(getenv("NUM_THREADS"));
+//int BLOCK_SIZE = atoi(getenv("BLOCK_SIZE"));
+
+#ifndef BLOCK_SIZE
+#define BLOCK_SIZE 256
+#endif
+#ifndef NUM_THREADS
+#define NUM_THREADS 1024
+#endif
+
 
 
 static void init_array(int n,

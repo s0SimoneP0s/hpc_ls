@@ -80,17 +80,14 @@ test_mini_CU_qa test_small_CU_qa test_standard_CU_qa test_large_CU_qa test_extra
 	@echo "==================================================="
 	@echo "Esecuzione $(patsubst %,%,$@)"
 	chmod +x $<
-	NUM_THREADS=128 BLOCK_SIZE=32   perf stat -r 4 ./$<
-	NUM_THREADS=128 BLOCK_SIZE=256  perf stat -r 4 ./$<
-	NUM_THREADS=256 BLOCK_SIZE=32   perf stat -r 4 ./$<
-	NUM_THREADS=256 BLOCK_SIZE=256  perf stat -r 4 ./$<
-	NUM_THREADS=256 BLOCK_SIZE=512  perf stat -r 4 ./$<
-	NUM_THREADS=512 BLOCK_SIZE=32   perf stat -r 4 ./$<
-	NUM_THREADS=512 BLOCK_SIZE=256  perf stat -r 4 ./$<
-	NUM_THREADS=512 BLOCK_SIZE=512  perf stat -r 4 ./$<
-	NUM_THREADS=1024 BLOCK_SIZE=32  perf stat -r 4 ./$<
-	NUM_THREADS=1024 BLOCK_SIZE=256 perf stat -r 4 ./$<
-	NUM_THREADS=1024 BLOCK_SIZE=512 perf stat -r 4 ./$<
+	@for nt in 128 256 512 1024; do \
+		for bs in 32 256 512; do \
+			make clean; \
+			echo "=== NUM_THREADS=$$nt BLOCK_SIZE=$$bs ==="; \
+			$(MAKE) -B NVCCFLAGS="$(NVCCFLAGS) -DNUM_THREADS=$$nt -DBLOCK_SIZE=$$bs" $(EXECUTABLE); \
+			perf stat -r 4 ./$(EXECUTABLE); \
+		done; \
+	done
 	@echo "...................................................."
 
 
