@@ -19,7 +19,7 @@
 
 int NUM_THREADS = atoi(getenv("NUM_THREADS"));
 int BLOCK_SIZE = atoi(getenv("BLOCK_SIZE"));
-int TILE_W = BLOCK_SIZE;
+
 
 static void init_array(int n,
                        DATA_TYPE POLYBENCH_1D(A, N, n),
@@ -47,7 +47,7 @@ static void print_array(int n, DATA_TYPE POLYBENCH_1D(A, N, n))
 
 __global__ void jacobi_1d_kernel(DATA_TYPE *A, DATA_TYPE *B, int n)
 {
-  __shared__ DATA_TYPE s_A[TILE_W + 2 * HALO]; 
+  extern __shared__ DATA_TYPE s_A[BLOCK_SIZE + 2 * HALO]; 
 
   int global_idx = blockIdx.x * blockDim.x + threadIdx.x;
   int local_idx = threadIdx.x;
@@ -64,7 +64,7 @@ __global__ void jacobi_1d_kernel(DATA_TYPE *A, DATA_TYPE *B, int n)
   }
 
   // right halo
-  if (local_idx >= TILE_W - HALO) {
+  if (local_idx >= BLOCK_SIZE - HALO) {
       int global_halo_idx = global_idx + HALO;
       s_A[local_idx + 2*HALO] = (global_halo_idx < n) ? A[global_halo_idx] : 0; 
   }
