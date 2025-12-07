@@ -62,12 +62,12 @@ run: $(EXECUTABLE)
 	@echo "Esecuzione con $(THREADS) thread..."
 	OMP_NUM_THREADS=$(THREADS) perf stat -r 10 ./$(EXECUTABLE)
 
-
+STAT_TRYS=10
 test_mini test_small test_standard test_large test_extralarge: $(EXECUTABLE)
 	@echo ===================================================
 	@echo "Esecuzione $(patsubst %,%,$@)"
 	@echo "=== Test con 1 thread ==="
-	OMP_NUM_THREADS=1 perf stat -r 10 ./$<
+	OMP_NUM_THREADS=1 perf stat -r $(STAT_TRYS) ./$<
 	@echo ....................................................
 
 
