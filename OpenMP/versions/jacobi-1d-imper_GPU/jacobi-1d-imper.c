@@ -14,13 +14,13 @@
 
 #ifndef OMP_NUM_TEAMS
   #define OMP_NUM_TEAMS 16
-  #define THREADS_CPU OMP_NUM_TEAMS
 #endif
 #ifndef OMP_TEAMS_THREAD_LIMIT
   #define OMP_TEAMS_THREAD_LIMIT 128
-  #define THREADS_GPU OMP_TEAMS_THREAD_LIMIT
 #endif
-
+  
+#define THREADS_CPU OMP_NUM_TEAMS
+#define THREADS_GPU OMP_TEAMS_THREAD_LIMIT
 
 
 /* Array initialization. */
