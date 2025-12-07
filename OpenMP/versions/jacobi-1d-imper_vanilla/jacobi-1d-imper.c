@@ -71,8 +71,8 @@ static void kernel_jacobi_1d_imper(int tsteps,
 int main(int argc, char **argv)
 {
   /* Retrieve problem size. */
-  int n = N;
-  int tsteps = TSTEPS;
+  int n = (int)N;
+  int tsteps = (int)TSTEPS;
   printf("n = %d\ntsteps = %d\n",n,tsteps);
   #pragma omp parallel 
   {

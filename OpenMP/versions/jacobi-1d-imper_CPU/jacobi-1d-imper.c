@@ -13,6 +13,9 @@
 
 int omp_get_num_threads(void);
 
+#ifndef OMP_NUM_THREADS
+#define OMP_NUM_THREADS 2
+#endif
 
 /* Array initialization. */
 static void init_array(int n,
@@ -81,8 +84,8 @@ static void kernel_jacobi_1d_imper(int tsteps,
 int main(int argc, char **argv)
 {
   /* Retrieve problem size. */
-  int n = N;
-  int tsteps = TSTEPS;
+  int n = (int)N;
+  int tsteps = (int)TSTEPS;
 
   /* Variable declaration/allocation. */
   POLYBENCH_1D_ARRAY_DECL(A, DATA_TYPE, N, n);

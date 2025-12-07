@@ -52,12 +52,10 @@ static void kernel_jacobi_1d_imper(int tsteps,
                                    )
 {
 
-  char* num_teams_env = getenv("OMP_NUM_TEAMS");
-  char* thread_limit_env = getenv("OMP_TEAMS_THREAD_LIMIT");
-  printf("Teams: %s\nThread limit: %s\n",num_teams_env,thread_limit_env);
 
-  int THREADS_CPU = atoi(num_teams_env);
-  int THREADS_GPU = atoi(thread_limit_env);
+
+  int THREADS_CPU = OMP_NUM_TEAMS;
+  int THREADS_GPU = OMP_TEAMS_THREAD_LIMIT;
   int t, i, j;
   #pragma omp target data map(tofrom: A[0:n]) map(alloc: B[0:n])
   {
@@ -91,19 +89,14 @@ static void kernel_jacobi_1d_imper(int tsteps,
 int main(int argc, char **argv)
 {
   /* Retrieve problem size. */
-  int n = N;
-  int tsteps = TSTEPS;
+  int n = (int)N;
+  int tsteps = (int)TSTEPS;
   printf("n = %d\ntsteps = %d\n",n,tsteps);
-
-
-
+  printf("Teams: %s\nThread limit: %s\n",OMP_NUM_TEAMS,OMP_TEAMS_THREAD_LIMIT);
 
   /* Variable declaration/allocation. */
   POLYBENCH_1D_ARRAY_DECL(A, DATA_TYPE, N, n);
   POLYBENCH_1D_ARRAY_DECL(B, DATA_TYPE, N, n);
-
-
-
 
   /* Initialize array(s). */
   init_array(n, POLYBENCH_ARRAY(A), POLYBENCH_ARRAY(B));
