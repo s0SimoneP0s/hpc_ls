@@ -76,6 +76,7 @@ void kernel_jacobi_1d_imper(int tsteps, int n,
       stop_timer(); 
       print_elapsed_ms("SAXPY execution time");
     }
+    cudaDeviceSynchronize()
     myCudaMemcpy<<<numBlocks, numThreads>>>(A, B, n);
 
   }
