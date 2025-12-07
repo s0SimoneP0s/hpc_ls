@@ -15,6 +15,17 @@
 
 #include "jacobi-1d-imper.h"
 
+#define CUDA_CHECK(call) \
+do { \
+    cudaError_t err = call; \
+    if (err != cudaSuccess) { \
+        printf("CUDA Error at %s:%d - %s\n", __FILE__, __LINE__, cudaGetErrorString(err)); \
+        printf("Error code: %d\n", err); \
+        exit(1); \
+    } \
+} while(0)
+
+
 int NUM_THREADS = atoi(getenv("NUM_THREADS"));
 int BLOCK_SIZE = atoi(getenv("BLOCK_SIZE"));
 
@@ -94,18 +105,14 @@ int main(int argc, char **argv)
   DATA_TYPE *A_uvm = NULL;
   DATA_TYPE *B_uvm = NULL;
   
-  // Allocate Unified Memory – accessible from CPU or GPU
   cudaMallocManaged(&A_uvm, sizeof(POLYBENCH_ARRAY(A)));
   cudaMallocManaged(&B_uvm, sizeof(POLYBENCH_ARRAY(B)));
   
-  if (A_uvm == NULL || B_uvm == NULL) {
-    printf("ERROR: Memory allocation failed!\n");
-    return 1;
-  }
+  cudaMemcpy(A_uvm, POLYBENCH_ARRAY(A), sizeof(POLYBENCH_ARRAY(A)), cudaMemcpyHostToDevice);
+  cudaMemcpy(B_uvm, POLYBENCH_ARRAY(B), sizeof(POLYBENCH_ARRAY(B)), cudaMemcpyHostToDevice);
   
-
   start_timer();
-  kernel_jacobi_1d_imper(tsteps, n, A_uvm, B_uvm);
+  CUDA_CHECK(kernel_jacobi_1d_imper(tsteps, n, A_uvm, B_uvm));
   stop_timer();
   print_elapsed_ms("Kernel execution time");  
 
