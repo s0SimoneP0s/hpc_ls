@@ -72,7 +72,7 @@ test_mini_C test_small_C test_standard_C test_large_C test_extralarge_C: $(EXECU
 	@for nt in 1 2 4 8; do \
 		make clean; \
 		echo "=== OMP_NUM_THREADS=$$nt  ==="; \
-		@echo "=== Test con $$nt1 thread ===" \
+		echo "=== Test con $$nt1 thread ===" \
 		$(MAKE) -B CCFLAGS="$(CCFLAGS) -DOMP_NUM_THREADS=$$nt" $(EXECUTABLE); \
 		perf stat -r $(STAT_TRYS) ./$(EXECUTABLE); \
 	done
