@@ -102,7 +102,7 @@ int main(int argc, char **argv)
   int n = (int)N;
   int tsteps = (int)TSTEPS;
   printf("n = %d\ntsteps = %d\n",n,tsteps);
-  printf("Teams: %s\nThread limit: %s\n",OMP_NUM_TEAMS,OMP_TEAMS_THREAD_LIMIT);
+  printf("Teams: %d\nThread limit: %d\n",OMP_NUM_TEAMS,OMP_TEAMS_THREAD_LIMIT);
 
   /* Variable declaration/allocation. */
   POLYBENCH_1D_ARRAY_DECL(A, DATA_TYPE, N, n);
