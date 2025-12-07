@@ -55,12 +55,14 @@ static void kernel_jacobi_1d_imper(int tsteps,
 
   for (t = 0; t < _PB_TSTEPS; t++)
   {
-    start_timer();
+    if (t == tsteps/2)
+      start_timer();
     for (i = 1; i < _PB_N - 1; i++)
       B[i] = 0.33333 * (A[i - 1] + A[i] + A[i + 1]);
-    stop_timer();
-    print_elapsed_ms("SAXPY execution time");
-
+    if (t == tsteps/2) {
+      stop_timer();
+      print_elapsed_ms("SAXPY execution time");
+    }
     for (j = 1; j < _PB_N - 1; j++)
       A[j] = B[j];
   }

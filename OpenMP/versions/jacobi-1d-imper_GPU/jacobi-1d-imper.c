@@ -63,7 +63,8 @@ static void kernel_jacobi_1d_imper(int tsteps,
   {
     for (t = 0; t < _PB_TSTEPS; t++)
     {
-      start_timer();
+      if (t == tsteps/2)
+        start_timer();
       #pragma omp target teams distribute parallel for simd \
                   num_teams(THREADS_CPU) thread_limit(THREADS_GPU) \
                   schedule(static) 
@@ -71,8 +72,10 @@ static void kernel_jacobi_1d_imper(int tsteps,
       {
         B[i] = 0.33333 * (A[i - 1] + A[i] + A[i + 1]);
       }
-      stop_timer();
-      print_elapsed_ms("SAXPY execution time");
+      if (t == tsteps/2) {
+        stop_timer();
+        print_elapsed_ms("SAXPY execution time");
+      }
       #pragma omp target teams distribute parallel for simd \
                   num_teams(THREADS_CPU) thread_limit(THREADS_GPU) \
                   schedule(static) 
