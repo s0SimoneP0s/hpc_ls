@@ -73,7 +73,7 @@ process_input() {
             time_elapsed=$(format_number "${BASH_REMATCH[1]}")
 
             # print csv
-            echo "${i};${n};${tsteps};${threads:-nan};${b_size:-nan};${time_elapsed:-nan};${insn_per_cycle:-nan};${branch_misses:-nan};${gpu_teams:-nan};${gpu_threads_per_team:-nan};${cuda_threads:-nan};${ket:-nan};${saxpy:-nan}"
+            echo "${i},${n},${tsteps},${threads:-nan},${b_size:-nan},${time_elapsed:-nan},${insn_per_cycle:-nan},${branch_misses:-nan},${gpu_teams:-nan},${gpu_threads_per_team:-nan},${cuda_threads:-nan},${ket:-nan},${saxpy:-nan}"
 
             # Reset
             time_elapsed=""

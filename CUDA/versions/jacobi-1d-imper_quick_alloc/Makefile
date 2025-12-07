@@ -73,22 +73,23 @@ profile: $(EXECUTABLE)
 	chmod +x $
 	$(CUDA_HOME)/bin/nvprof ./$(EXECUTABLE)
 
+
 test_mini_CU_qa test_small_CU_qa test_standard_CU_qa test_large_CU_qa test_extralarge_CU_qa: $(EXECUTABLE)
 	@echo "==================================================="
 	@echo "Esecuzione $(patsubst %,%,$@)"
 	chmod +x $<
-	NUM_THREADS=128 BLOCK_SIZE=32  perf stat -r 5 ./$<
-	NUM_THREADS=128 BLOCK_SIZE=128 perf stat -r 5 ./$<
-	NUM_THREADS=128 BLOCK_SIZE=256 perf stat -r 5 ./$<
-	NUM_THREADS=128 BLOCK_SIZE=512 perf stat -r 5 ./$<
-	NUM_THREADS=256 BLOCK_SIZE=32  perf stat -r 5 ./$<
-	NUM_THREADS=256 BLOCK_SIZE=128 perf stat -r 5 ./$<
-	NUM_THREADS=256 BLOCK_SIZE=256 perf stat -r 5 ./$<
-	NUM_THREADS=256 BLOCK_SIZE=512 perf stat -r 5 ./$<
-	NUM_THREADS=512 BLOCK_SIZE=32  perf stat -r 5 ./$<
-	NUM_THREADS=512 BLOCK_SIZE=128 perf stat -r 5 ./$<
-	NUM_THREADS=512 BLOCK_SIZE=256 perf stat -r 5 ./$<
-	NUM_THREADS=512 BLOCK_SIZE=512 perf stat -r 5 ./$<
+	NUM_THREADS=128 BLOCK_SIZE=32  $(CUDA_HOME)/bin/nvprof stat -r 5 ./$<
+	NUM_THREADS=128 BLOCK_SIZE=128 $(CUDA_HOME)/bin/nvprof stat -r 5 ./$<
+	NUM_THREADS=128 BLOCK_SIZE=256 $(CUDA_HOME)/bin/nvprof stat -r 5 ./$<
+	NUM_THREADS=128 BLOCK_SIZE=512 $(CUDA_HOME)/bin/nvprof stat -r 5 ./$<
+	NUM_THREADS=256 BLOCK_SIZE=32  $(CUDA_HOME)/bin/nvprof stat -r 5 ./$<
+	NUM_THREADS=256 BLOCK_SIZE=128 $(CUDA_HOME)/bin/nvprof stat -r 5 ./$<
+	NUM_THREADS=256 BLOCK_SIZE=256 $(CUDA_HOME)/bin/nvprof stat -r 5 ./$<
+	NUM_THREADS=256 BLOCK_SIZE=512 $(CUDA_HOME)/bin/nvprof stat -r 5 ./$<
+	NUM_THREADS=512 BLOCK_SIZE=32  $(CUDA_HOME)/bin/nvprof stat -r 5 ./$<
+	NUM_THREADS=512 BLOCK_SIZE=128 $(CUDA_HOME)/bin/nvprof stat -r 5 ./$<
+	NUM_THREADS=512 BLOCK_SIZE=256 $(CUDA_HOME)/bin/nvprof stat -r 5 ./$<
+	NUM_THREADS=512 BLOCK_SIZE=512 $(CUDA_HOME)/bin/nvprof stat -r 5 ./$<
 	@echo "...................................................."
 
 
