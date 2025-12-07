@@ -75,7 +75,7 @@ profile: $(EXECUTABLE)
 	LD_LIBRARY_PATH=$(LD_LIBRARY_PATH) $(CUDA_HOME)/bin/nvprof --print-gpu-trace -o trace ./$(EXECUTABLE)
 
 
-
+STAT_TRYS=4
 test_mini_CU_qa test_small_CU_qa test_standard_CU_qa test_large_CU_qa test_extralarge_CU_qa: $(EXECUTABLE)
 	@echo "==================================================="
 	@echo "Esecuzione $(patsubst %,%,$@)"
@@ -85,7 +85,7 @@ test_mini_CU_qa test_small_CU_qa test_standard_CU_qa test_large_CU_qa test_extra
 			make clean; \
 			echo "=== NUM_THREADS=$$nt BLOCK_SIZE=$$bs ==="; \
 			$(MAKE) -B NVCCFLAGS="$(NVCCFLAGS) -DNUM_THREADS=$$nt -DBLOCK_SIZE=$$bs" $(EXECUTABLE); \
-			perf stat -r 4 ./$(EXECUTABLE); \
+			perf stat -r $(STAT_TRYS) ./$(EXECUTABLE); \
 		done; \
 	done
 	@echo "...................................................."

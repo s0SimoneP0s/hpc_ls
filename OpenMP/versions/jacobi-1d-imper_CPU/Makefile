@@ -64,18 +64,19 @@ run: $(EXECUTABLE)
 	OMP_NUM_THREADS=$(THREADS) perf stat -r 10 ./$(EXECUTABLE)
 
 
+STAT_TRYS=10
 test_mini_C test_small_C test_standard_C test_large_C test_extralarge_C: $(EXECUTABLE)
-	@echo ===================================================
+	@echo "==================================================="
 	@echo "Esecuzione $(patsubst %,%,$@)"
-	@echo "=== Test con 1 thread ==="
-	OMP_NUM_THREADS=1 perf stat -r 10 ./$(EXECUTABLE)
-	@echo "\n=== Test con 2 thread ==="
-	OMP_NUM_THREADS=2 perf stat -r 10 ./$(EXECUTABLE)
-	@echo "\n=== Test con 4 thread ==="
-	OMP_NUM_THREADS=4 perf stat -r 10 ./$(EXECUTABLE)
-	@echo "\n=== Test con 8 thread ==="
-	OMP_NUM_THREADS=8 perf stat -r 10 ./$(EXECUTABLE)
-	@echo ....................................................
+	chmod +x $<
+	@for nt in 1 2 4 8; do \
+		make clean; \
+		echo "=== OMP_NUM_THREADS=$$nt  ==="; \
+		$(MAKE) -B CCFLAGS="$(CCFLAGS) -DOMP_NUM_THREADS=$$nt" $(EXECUTABLE); \
+		perf stat -r $(STAT_TRYS) ./$(EXECUTABLE); \
+	done
+	@echo "...................................................."
+
 
 
 optimized: CCFLAGS += -O3 -march=native -mtune=native -ffast-math

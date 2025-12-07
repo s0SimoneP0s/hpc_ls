@@ -64,19 +64,20 @@ run: $(EXECUTABLE)
 	@echo "Esecuzione con $(THREADS) thread..."
 	OMP_NUM_THREADS=$(THREADS) perf stat -r 5 ./$(EXECUTABLE)
 
-
+STAT_TRYS=4
 test_mini_G test_small_G test_standard_G test_large_G test_extralarge_G: $(EXECUTABLE)
-	@echo ===================================================
-	@echo "Esecuzione MINI_DATASET "
-	OMP_NUM_TEAMS=2 OMP_TEAMS_THREAD_LIMIT=16 perf stat -r 5 ./$(EXECUTABLE)
-	OMP_NUM_TEAMS=2 OMP_TEAMS_THREAD_LIMIT=128 perf stat -r 5 ./$(EXECUTABLE)
-	OMP_NUM_TEAMS=4 OMP_TEAMS_THREAD_LIMIT=16 perf stat -r 5 ./$(EXECUTABLE)
-	OMP_NUM_TEAMS=4 OMP_TEAMS_THREAD_LIMIT=128 perf stat -r 5 ./$(EXECUTABLE)
-	OMP_NUM_TEAMS=32 OMP_TEAMS_THREAD_LIMIT=16 perf stat -r 5 ./$(EXECUTABLE)
-	OMP_NUM_TEAMS=32 OMP_TEAMS_THREAD_LIMIT=128 perf stat -r 5 ./$(EXECUTABLE)
-	OMP_NUM_TEAMS=128 OMP_TEAMS_THREAD_LIMIT=16 perf stat -r 5 ./$(EXECUTABLE)
-	OMP_NUM_TEAMS=128 OMP_TEAMS_THREAD_LIMIT=128 perf stat -r 5 ./$(EXECUTABLE)
-	@echo ....................................................
+	@echo "==================================================="
+	@echo "Esecuzione $(patsubst %,%,$@)"
+	chmod +x $<
+	@for nt in 2 3 32 128; do \
+		for ttl in 16 128; do \
+			make clean; \
+			echo "=== OMP_NUM_TEAMS=$$nt OMP_TEAMS_THREAD_LIMIT=$$ttl ==="; \
+			$(MAKE) -B CCFLAGS="$(CCFLAGS) -DOMP_NUM_TEAMS=$$nt -DOMP_TEAMS_THREAD_LIMIT=$$ttl" $(EXECUTABLE); \
+			perf stat -r $(STAT_TRYS) ./$(EXECUTABLE); \
+		done; \
+	done
+	@echo "...................................................."
 
 
 # OMP_TARGET_OFFLOAD=MANDATORY
