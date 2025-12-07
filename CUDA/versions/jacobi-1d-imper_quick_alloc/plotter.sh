@@ -1,8 +1,11 @@
 #!/bin/bash
 
 source ../../../utils/plotter_utils.sh
+source ../../utilities/gpu_check.sh
 
 declare -a test_size_list=("test_mini_CU_qa" "test_small_CU_qa" "test_standard_CU_qa" "test_large_CU_qa" "test_extralarge_CU_qa")
+
+check_gpu
 
 for i in "${test_size_list[@]}"; do
 
