@@ -24,5 +24,10 @@ cd CUDA/versions
   cd jacobi-1d-imper_quick_alloc
   ./plotter.sh
   cd ..
-  
+
+
+  cd jacobi-1d-imper_opt
+  ./plotter.sh
+  cd ..
+
 cd ../..

@@ -15,10 +15,11 @@
 
 #include "jacobi-1d-imper.h"
 
+#define HALO 1
 
 int NUM_THREADS = atoi(getenv("NUM_THREADS"));
 int BLOCK_SIZE = atoi(getenv("BLOCK_SIZE"));
-
+#define TILE_W (BLOCK_SIZE)
 
 static void init_array(int n,
                        DATA_TYPE POLYBENCH_1D(A, N, n),
