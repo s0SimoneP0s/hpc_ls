@@ -13,8 +13,10 @@ EXECUTABLE := $(BENCHMARK:.c=_omp)
 OBJ_FILES := $(BUILD_DIR)/$(BENCHMARK:.c=.c.o) $(BUILD_DIR)/polybench.c.o $(BUILD_DIR)/elapsed.c.o
 
 
+
+
 $(foreach size,mini_C small_C standard_C large_C extralarge_C,\
-  $(if $(filter test_$(size),$(MAKECMDGOALS)),$(eval DATASET=-D$(shell echo $(size) | tr a-z A-Z)_DATASET)))
+  $(if $(filter test_$(size)_C,$(MAKECMDGOALS)),$(eval DATASET=-D$(shell echo $(size) | tr a-z A-Z)_DATASET)))
 
 $(info Dataset : $(DATASET))
 
