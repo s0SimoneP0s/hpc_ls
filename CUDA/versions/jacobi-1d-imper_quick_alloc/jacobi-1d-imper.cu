@@ -84,6 +84,8 @@ int main(int argc, char **argv)
   
   int n = (int)N;
   int tsteps = (int)TSTEPS;
+  printf("n = %d\ntsteps = %d\n", n, tsteps);
+  printf("Threads: %d\nBlock Size: %d\n",NUM_THREADS,BLOCK_SIZE);
 
   POLYBENCH_1D_ARRAY_DECL(A, DATA_TYPE, N, n);
   POLYBENCH_1D_ARRAY_DECL(B, DATA_TYPE, N, n);
