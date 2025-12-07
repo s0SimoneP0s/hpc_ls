@@ -2,6 +2,7 @@
 
 format_number() {
     local num="$1"
+    num="${num//,/\.}"
     num="$(echo -n "$num" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')" # skipwtsp
     echo "$num"
 }
