@@ -107,8 +107,7 @@ int main(int argc, char **argv)
   start_timer();
   kernel_jacobi_1d_imper(tsteps, n, A_uvm, B_uvm);
   stop_timer();
-  print_elapsed_ms("Total kernel execution time");
-  
+  print_elapsed_ms("Kernel execution time");  
 
   cudaFree(A_uvm);
   cudaFree(B_uvm);
