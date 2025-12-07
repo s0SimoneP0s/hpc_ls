@@ -47,40 +47,40 @@ static void print_array(int n, DATA_TYPE POLYBENCH_1D(A, N, n))
 
 __global__ void jacobi_1d_kernel(DATA_TYPE *A, DATA_TYPE *B, int n)
 {
-  extern __shared__ DATA_TYPE s_A[BLOCK_SIZE + 2 * HALO]; 
+  extern __shared__ DATA_TYPE s_A[];
 
   int global_idx = blockIdx.x * blockDim.x + threadIdx.x;
   int local_idx = threadIdx.x;
   
   // main data
-  if (global_idx < n) {
-      s_A[local_idx + HALO] = A[global_idx]; 
-  }
+  if (global_idx < n)
+    s_A[local_idx + HALO] = A[global_idx];
   
   // left halo
   if (local_idx < HALO) {
-      int global_halo_idx = global_idx - HALO;
-      s_A[local_idx] = (global_halo_idx >= 0) ? A[global_halo_idx] : 0; 
+    int gh = global_idx - HALO;
+    s_A[local_idx] = (gh >= 0) ? A[gh] : 0;
   }
 
   // right halo
   if (local_idx >= BLOCK_SIZE - HALO) {
-      int global_halo_idx = global_idx + HALO;
-      s_A[local_idx + 2*HALO] = (global_halo_idx < n) ? A[global_halo_idx] : 0; 
+    int gh = global_idx + HALO;
+    s_A[local_idx + 2*HALO] = (gh < n) ? A[gh] : 0;
   }
   
   __syncthreads(); 
 
   if (global_idx > 0 && global_idx < n - 1) 
   {
-      DATA_TYPE tmp = s_A[local_idx] + s_A[local_idx + 1] + s_A[local_idx + 2];
-      B[global_idx] = 0.33333 * tmp; 
+    DATA_TYPE tmp = s_A[local_idx] + s_A[local_idx + 1] + s_A[local_idx + 2];
+    B[global_idx] = 0.33333 * tmp; 
   }
 }
 
 __global__ void myCudaMemcpy(DATA_TYPE *A, DATA_TYPE *B, const int n) {
-    int i = blockIdx.x * blockDim.x + threadIdx.x;
-    if (i < n) A[i] = B[i];
+  int i = blockIdx.x * blockDim.x + threadIdx.x;
+  if (i < n) 
+    A[i] = B[i];
 }
 
 void kernel_jacobi_1d_imper(int tsteps, int n,
@@ -94,7 +94,9 @@ void kernel_jacobi_1d_imper(int tsteps, int n,
 
     if (t == tsteps/2)
       start_timer();
-    jacobi_1d_kernel<<<numBlocks, numThreads>>>(A, B, n);
+    //jacobi_1d_kernel<<<numBlocks, numThreads>>>(A, B, n);
+    size_t shmem = (BLOCK_SIZE + 2*HALO) * sizeof(DATA_TYPE);
+    jacobi_1d_kernel<<<numBlocks, numThreads, shmem>>>(A, B, n);
     if (t == tsteps/2)  { // took the middle iteration
       stop_timer(); 
       print_elapsed_ms("SAXPY execution time");
