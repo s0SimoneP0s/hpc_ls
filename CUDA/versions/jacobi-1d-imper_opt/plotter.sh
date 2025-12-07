@@ -1,0 +1,29 @@
+#!/bin/bash
+
+source ../../../utils/plotter_utils.sh
+source ../../utilities/gpu_check.sh
+
+declare -a test_size_list=("test_mini_CU_opt" "test_small_CU_opt" "test_standard_CU_opt" "test_large_CU_opt" "test_extralarge_CU_opt")
+
+if [[ $1 == "debug" ]] ; then
+    check_gpu
+fi
+
+for i in "${test_size_list[@]}"; do
+
+    make clean > /dev/null 2>&1
+    make "$i" > "input_${i}.txt" 2>&1
+
+    case "$i" in
+        test_mini_CU_opt)    n=500; tsteps=2 ;;
+        test_small_CU_opt)   n=1000; tsteps=10 ;;
+        test_standard_CU_opt)  n=10000; tsteps=100 ;;
+        test_large_CU_opt) n=100000; tsteps=1000 ;;
+        test_extralarge_CU_opt) n=1000000; tsteps=1000 ;;
+        *) n=0; tsteps=0 ;;
+    esac
+
+    process_input "input_${i}.txt" "$i" "$n" "$tsteps"
+
+done
+rm input_*.txt
