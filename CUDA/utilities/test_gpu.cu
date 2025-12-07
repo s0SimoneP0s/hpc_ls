@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <cuda_runtime.h>
 
-// macro per error checking
+// macro for error checking
 #define CUDA_CHECK(x) do { \
     cudaError_t err = x; \
     if (err != cudaSuccess) { \
@@ -38,7 +38,7 @@ int main()
     printf("  name: %s\n", p.name);
     printf("  compute capability: %d.%d\n", p.major, p.minor);
     printf("  multiprocessor: %d\n", p.multiProcessorCount);
-    printf("  globale memory: %.2f MB\n", p.totalGlobalMem / (1024.0 * 1024.0));
+    printf("  global memory: %.2f MB\n", p.totalGlobalMem / (1024.0 * 1024.0));
     printf("============================================\n\n");
 
     // test size
@@ -50,8 +50,9 @@ int main()
     float *a;
     CUDA_CHECK(cudaMallocManaged(&a, bytes));
 
-    // inizializzazione
-    for (int i = 0; i < 1000; i++) a[i] = 1.0f;
+    // initialize
+    for (int i = 0; i < 1000; i++) 
+        a[i] = 1.0f;
 
     CUDA_CHECK(cudaDeviceSynchronize());
 
@@ -60,7 +61,7 @@ int main()
 
     printf("grid = %d  block = %d\n", grid, block);
 
-    // tile elaps
+    // time elapsed
     cudaEvent_t start, stop;
     cudaEventCreate(&start);
     cudaEventCreate(&stop);
@@ -77,14 +78,14 @@ int main()
     cudaEventElapsedTime(&ms, start, stop);
 
     printf("\nkernel time elapsed: %.2f ms\n", ms);
-    printf("verifica valori...\n");
+    printf("check values...\n");
 
     if (isnan(a[10]) || isinf(a[10])) {
         printf("error: not valid error, gpu problem should exist\n");
         return 1;
     }
 
-    printf("test works correctly, cuda gpu correctly intsalled\n");
+    printf("test works correctly, cuda gpu correctly installed\n");
 
     cudaFree(a);
     return 0;
