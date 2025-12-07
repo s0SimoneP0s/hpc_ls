@@ -15,10 +15,11 @@
 
 #include "jacobi-1d-imper.h"
 
+#define HALO 1
 
 int NUM_THREADS = atoi(getenv("NUM_THREADS"));
 int BLOCK_SIZE = atoi(getenv("BLOCK_SIZE"));
-
+#define TILE_W (BLOCK_SIZE)
 
 static void init_array(int n,
                        DATA_TYPE POLYBENCH_1D(A, N, n),
@@ -46,12 +47,34 @@ static void print_array(int n, DATA_TYPE POLYBENCH_1D(A, N, n))
 
 __global__ void jacobi_1d_kernel(DATA_TYPE *A, DATA_TYPE *B, int n)
 {
-  int i = blockIdx.x * blockDim.x + threadIdx.x;
+  __shared__ DATA_TYPE s_A[TILE_W + 2 * HALO]; 
+
+  int global_idx = blockIdx.x * blockDim.x + threadIdx.x;
+  int local_idx = threadIdx.x;
   
-  if (i > 0 && i < n - 1)
+  // main data
+  if (global_idx < n) {
+      s_A[local_idx + HALO] = A[global_idx]; 
+  }
+  
+  // left halo
+  if (local_idx < HALO) {
+      int global_halo_idx = global_idx - HALO;
+      s_A[local_idx] = (global_halo_idx >= 0) ? A[global_halo_idx] : 0; 
+  }
+
+  // right halo
+  if (local_idx >= TILE_W - HALO) {
+      int global_halo_idx = global_idx + HALO;
+      s_A[local_idx + 2*HALO] = (global_halo_idx < n) ? A[global_halo_idx] : 0; 
+  }
+  
+  __syncthreads(); 
+
+  if (global_idx > 0 && global_idx < n - 1) 
   {
-    DATA_TYPE tmp = A[i - 1] + A[i] + A[i + 1];
-    B[i] = 0.33333 * tmp;
+      DATA_TYPE tmp = s_A[local_idx] + s_A[local_idx + 1] + s_A[local_idx + 2];
+      B[global_idx] = 0.33333 * tmp; 
   }
 }
 
@@ -72,7 +95,7 @@ void kernel_jacobi_1d_imper(int tsteps, int n,
     if (t == tsteps/2)
       start_timer();
     jacobi_1d_kernel<<<numBlocks, numThreads>>>(A, B, n);
-    if (t == tsteps/2)  {// took the middle iteration
+    if (t == tsteps/2)  { // took the middle iteration
       stop_timer(); 
       print_elapsed_ms("SAXPY execution time");
     }
