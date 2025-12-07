@@ -17,9 +17,15 @@
 
 #define HALO 1
 
-int NUM_THREADS = atoi(getenv("NUM_THREADS"));
-int BLOCK_SIZE = atoi(getenv("BLOCK_SIZE"));
+//int NUM_THREADS = atoi(getenv("NUM_THREADS"));
+//int BLOCK_SIZE = atoi(getenv("BLOCK_SIZE"));
 
+#ifndef BLOCK_SIZE
+#define BLOCK_SIZE 256
+#endif
+#ifndef NUM_THREADS
+#define NUM_THREADS 1024
+#endif
 
 static void init_array(int n,
                        DATA_TYPE POLYBENCH_1D(A, N, n),
@@ -95,7 +101,7 @@ void kernel_jacobi_1d_imper(int tsteps, int n,
     if (t == tsteps/2)
       start_timer();
     //jacobi_1d_kernel<<<numBlocks, numThreads>>>(A, B, n);
-    size_t shmem = (BLOCK_SIZE + 2*HALO) * sizeof(DATA_TYPE);
+    size_t shmem = (BLOCK_SIZE + 2*HALO) * sizeof(DATA_TYPE); // shared memory size for each thread block to aggregate halo
     jacobi_1d_kernel<<<numBlocks, numThreads, shmem>>>(A, B, n);
     if (t == tsteps/2)  { // took the middle iteration
       stop_timer(); 
