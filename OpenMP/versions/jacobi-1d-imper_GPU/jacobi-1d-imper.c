@@ -12,6 +12,17 @@
 #include "jacobi-1d-imper.h"
 
 
+#ifndef OMP_NUM_TEAMS
+  #define OMP_NUM_TEAMS 16
+  #define THREADS_CPU OMP_NUM_TEAMS
+#endif
+#ifndef OMP_TEAMS_THREAD_LIMIT
+  #define OMP_TEAMS_THREAD_LIMIT 128
+  #define THREADS_GPU OMP_TEAMS_THREAD_LIMIT
+#endif
+
+
+
 /* Array initialization. */
 static void init_array(int n,
                        DATA_TYPE POLYBENCH_1D(A, N, n),
@@ -54,8 +65,7 @@ static void kernel_jacobi_1d_imper(int tsteps,
 
 
 
-  int THREADS_CPU = OMP_NUM_TEAMS;
-  int THREADS_GPU = OMP_TEAMS_THREAD_LIMIT;
+
   int t, i, j;
   #pragma omp target data map(tofrom: A[0:n]) map(alloc: B[0:n])
   {
