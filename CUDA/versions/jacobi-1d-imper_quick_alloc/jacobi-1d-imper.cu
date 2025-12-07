@@ -69,11 +69,13 @@ void kernel_jacobi_1d_imper(int tsteps, int n,
 
   for (int t = 0; t < tsteps; t++) {
 
-    start_timer();
+    if (t == tsteps/2)
+      start_timer();
     jacobi_1d_kernel<<<numBlocks, numThreads>>>(A, B, n);
-    stop_timer();
-    if (t == tsteps/2) // took the middle iteration
+    if (t == tsteps/2)  {// took the middle iteration
+      stop_timer(); 
       print_elapsed_ms("SAXPY execution time");
+    }
     myCudaMemcpy<<<numBlocks, numThreads>>>(A, B, n);
 
   }
