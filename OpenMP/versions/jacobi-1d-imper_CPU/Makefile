@@ -15,8 +15,26 @@ OBJ_FILES := $(BUILD_DIR)/$(BENCHMARK:.c=.c.o) $(BUILD_DIR)/polybench.c.o $(BUIL
 
 
 
-$(foreach size,mini_C small_C standard_C large_C extralarge_C,\
-  $(if $(filter test_$(size)_C,$(MAKECMDGOALS)),$(eval DATASET=-D$(shell echo $(size) | tr a-z A-Z)_DATASET)))
+#$(foreach size,mini_C small_C standard_C large_C extralarge_C,\
+#  $(if $(filter test_$(size)_C,$(MAKECMDGOALS)),$(eval DATASET=-D$(shell echo $(size) | tr a-z A-Z)_DATASET)))
+
+ifeq ($(MAKECMDGOALS),test_mini_C)
+	DATASET = -DMINI_DATASET
+endif
+ifeq ($(MAKECMDGOALS),test_small_C)
+	DATASET = -DSMALL_DATASET
+endif
+ifeq ($(MAKECMDGOALS),test_standard_C)
+	DATASET = -DSTANDARD_DATASET
+endif
+ifeq ($(MAKECMDGOALS),test_large_C)
+	DATASET = -DLARGE_DATASET
+endif
+ifeq ($(MAKECMDGOALS),test_extralarge_C)
+	DATASET = -DEXTRALARGE_DATASET
+endif
+
+
 
 $(info Dataset : $(DATASET))
 

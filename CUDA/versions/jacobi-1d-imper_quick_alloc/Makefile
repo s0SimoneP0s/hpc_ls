@@ -16,8 +16,24 @@ EXECUTABLE := $(BENCHMARK:.cu=_cuda)
 OBJ_FILES := $(BUILD_DIR)/$(BENCHMARK:.cu=.cu.o) $(BUILD_DIR)/polybench.c.o $(BUILD_DIR)/elapsed.c.o
 
 
-$(foreach size,mini_CU_qa small_CU_qa standard_CU_qa large_CU_qa extralarge_CU_qa,\
-  $(if $(filter test_$(size)_CU_qa,$(MAKECMDGOALS)),$(eval DATASET=-D$(shell echo $(size) | tr a-z A-Z)_DATASET)))
+#$(foreach size,mini_CU_qa small_CU_qa standard_CU_qa large_CU_qa extralarge_CU_qa,\
+#  $(if $(filter test_$(size)_CU_qa,$(MAKECMDGOALS)),$(eval DATASET=-D$(shell echo $(size) | tr a-z A-Z)_DATASET)))
+
+ifeq ($(MAKECMDGOALS),test_mini_CU_qa)
+	DATASET = -DMINI_DATASET
+endif
+ifeq ($(MAKECMDGOALS),test_small_CU_qa)
+	DATASET = -DSMALL_DATASET
+endif
+ifeq ($(MAKECMDGOALS),test_standard_CU_qa)
+	DATASET = -DSTANDARD_DATASET
+endif
+ifeq ($(MAKECMDGOALS),test_large_CU_qa)
+	DATASET = -DLARGE_DATASET
+endif
+ifeq ($(MAKECMDGOALS),test_extralarge_CU_qa)
+	DATASET = -DEXTRALARGE_DATASET
+endif
 
 
 $(info Dataset flag: $(DATASET))

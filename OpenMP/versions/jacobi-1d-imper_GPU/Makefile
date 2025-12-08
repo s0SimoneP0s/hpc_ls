@@ -12,8 +12,24 @@ EXECUTABLE := $(BENCHMARK:.c=_omp)
 OBJ_FILES := $(BUILD_DIR)/$(BENCHMARK:.c=.c.o) $(BUILD_DIR)/polybench.c.o $(BUILD_DIR)/elapsed.c.o
 
 
-$(foreach size,mini_G small_G standard_G large_G extralarge_G,\
-  $(if $(filter test_$(size)_G,$(MAKECMDGOALS)),$(eval DATASET=-D$(shell echo $(size) | tr a-z A-Z)_DATASET)))
+#$(foreach size,mini_G small_G standard_G large_G extralarge_G,\
+#  $(if $(filter test_$(size)_G,$(MAKECMDGOALS)),$(eval DATASET=-D$(shell echo $(size) | tr a-z A-Z)_DATASET)))
+
+ifeq ($(MAKECMDGOALS),test_mini_G)
+	DATASET = -DMINI_DATASET
+endif
+ifeq ($(MAKECMDGOALS),test_small_G)
+	DATASET = -DSMALL_DATASET
+endif
+ifeq ($(MAKECMDGOALS),test_standard_G)
+	DATASET = -DSTANDARD_DATASET
+endif
+ifeq ($(MAKECMDGOALS),test_large_G)
+	DATASET = -DLARGE_DATASET
+endif
+ifeq ($(MAKECMDGOALS),test_extralarge_G)
+	DATASET = -DEXTRALARGE_DATASET
+endif
 
 $(info Dataset : $(DATASET))
 
