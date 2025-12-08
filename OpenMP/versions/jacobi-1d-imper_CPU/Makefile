@@ -92,7 +92,7 @@ test_mini_C test_small_C test_standard_C test_large_C test_extralarge_C: $(EXECU
 		echo "=== OMP_NUM_THREADS=$$nt  ==="; \
 		echo "=== Test con $$nt thread ===" ; \
 		$(MAKE) -B CCFLAGS="$(CCFLAGS) -DOMP_NUM_THREADS=$$nt" $(EXECUTABLE); \
-		perf stat -r $(STAT_TRYS) ./$(EXECUTABLE); \
+		OMP_NUM_THREADS=$$nt perf stat -r $(STAT_TRYS) ./$(EXECUTABLE); \
 	done
 	@echo "...................................................."
 

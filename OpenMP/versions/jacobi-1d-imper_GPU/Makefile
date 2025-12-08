@@ -90,7 +90,7 @@ test_mini_G test_small_G test_standard_G test_large_G test_extralarge_G: $(EXECU
 			make clean; \
 			echo "=== OMP_NUM_TEAMS=$$nt OMP_TEAMS_THREAD_LIMIT=$$ttl ==="; \
 			$(MAKE) -B CCFLAGS="$(CCFLAGS) -DOMP_NUM_TEAMS=$$nt -DOMP_TEAMS_THREAD_LIMIT=$$ttl" $(EXECUTABLE); \
-			perf stat -r $(STAT_TRYS) ./$(EXECUTABLE); \
+			OMP_NUM_TEAMS=$$nt OMP_TEAM_LIMIT=$$ttl perf stat -r $(STAT_TRYS) ./$(EXECUTABLE); \
 		done; \
 	done
 	@echo "...................................................."
