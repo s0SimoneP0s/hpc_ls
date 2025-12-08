@@ -108,8 +108,10 @@ int main(int argc, char **argv)
   cudaMallocManaged(&A_uvm, sizeof(POLYBENCH_ARRAY(A)));
   cudaMallocManaged(&B_uvm, sizeof(POLYBENCH_ARRAY(B)));
   
-  cudaMemcpy(A_uvm, POLYBENCH_ARRAY(A), sizeof(POLYBENCH_ARRAY(A)), cudaMemcpyHostToDevice);
-  cudaMemcpy(B_uvm, POLYBENCH_ARRAY(B), sizeof(POLYBENCH_ARRAY(B)), cudaMemcpyHostToDevice);
+  cudaMemcpy(A_uvm, POLYBENCH_ARRAY(A), sizeof(POLYBENCH_ARRAY(A)),
+  cudaMemcpyHostToDevice);
+  cudaMemcpy(B_uvm, POLYBENCH_ARRAY(B), sizeof(POLYBENCH_ARRAY(B)),
+  cudaMemcpyHostToDevice);
   
   start_timer();
   kernel_jacobi_1d_imper(tsteps, n, A_uvm, B_uvm);
