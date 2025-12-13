@@ -65,7 +65,7 @@ static void kernel_jacobi_1d_imper(int tsteps,
     {
       if (t == tsteps/2)
         start_timer();
-      #pragma omp parallel private(i) 
+      #pragma omp parallel for private(i) 
       for (i = 1; i < _PB_N - 1; i++)
         B[i] = 0.33333 * (A[i - 1] + A[i] + A[i + 1]);
       if (t == tsteps/2){
@@ -74,7 +74,7 @@ static void kernel_jacobi_1d_imper(int tsteps,
       }
       
 
-      #pragma omp parallel private(j) 
+      #pragma omp parallel for private(j) 
       for (j = 1; j < _PB_N - 1; j++) 
         A[j] = B[j];
     }
